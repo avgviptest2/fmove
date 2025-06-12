@@ -30,8 +30,21 @@ export const episodes = pgTable("episodes", {
   duration: integer("duration"), // in minutes
 });
 
-export const insertMovieSchema = createInsertSchema(movies).omit({
-  id: true,
+export const insertMovieSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  year: z.number().int().min(1900).max(new Date().getFullYear() + 5),
+  duration: z.number().int().min(1),
+  type: z.enum(['movie', 'tv']),
+  genres: z.array(z.string()).min(1),
+  countries: z.array(z.string()).min(1),
+  quality: z.string().default('HD'),
+  rating: z.number().min(0).max(10).default(7.0),
+  poster: z.string().url(),
+  backdrop: z.string().url(),
+  play_url: z.string().url().optional(),
+  trailer_url: z.string().url().optional(),
+  featured: z.boolean().default(false)
 });
 
 export const insertEpisodeSchema = createInsertSchema(episodes).omit({

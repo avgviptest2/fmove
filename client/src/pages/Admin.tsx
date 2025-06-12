@@ -44,6 +44,7 @@ export default function Admin() {
       poster: '',
       backdrop: '',
       play_url: '',
+      trailer_url: '',
       featured: false
     }
   });
@@ -139,6 +140,7 @@ export default function Admin() {
       poster: movie.poster,
       backdrop: movie.backdrop,
       play_url: movie.play_url || '',
+      trailer_url: movie.trailer_url || '',
       featured: movie.featured
     });
     setIsDialogOpen(true);
