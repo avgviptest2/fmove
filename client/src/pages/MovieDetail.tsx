@@ -79,7 +79,7 @@ export default function MovieDetail() {
     <div className="min-h-screen bg-dark-primary">
       {/* Hero Backdrop */}
       <div 
-        className="relative h-64 bg-cover bg-center"
+        className="relative h-64 bg-contain bg-center bg-no-repeat"
         style={{
           backgroundImage: movie.backdrop ? `url(${movie.backdrop})` : undefined,
         }}
