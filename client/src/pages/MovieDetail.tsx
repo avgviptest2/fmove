@@ -103,16 +103,28 @@ export default function MovieDetail() {
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Movie Poster */}
           <div className="lg:col-span-2">
-            <div className="relative group max-w-xs mx-auto lg:mx-0">
-              <img 
-                src={movie.poster} 
-                alt={movie.title}
-                className="w-full rounded-lg shadow-xl transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute top-3 left-3">
-                <Badge className="bg-green-600 text-white font-semibold">
-                  {movie.quality}
-                </Badge>
+            <div className="space-y-4">
+              <div className="relative group max-w-xs mx-auto lg:mx-0">
+                <img 
+                  src={movie.poster} 
+                  alt={movie.title}
+                  className="w-full rounded-lg shadow-xl transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 left-3">
+                  <Badge className="bg-green-600 text-white font-semibold">
+                    {movie.quality}
+                  </Badge>
+                </div>
+              </div>
+              
+              {/* Trailer Button under Poster */}
+              <div className="max-w-xs mx-auto lg:mx-0">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
+                >
+                  Trailer
+                </Button>
               </div>
             </div>
           </div>
@@ -149,76 +161,64 @@ export default function MovieDetail() {
               </div>
 
               {/* Movie Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
                   <span className="text-accent-cyan font-medium">Genres:</span>
-                  <div className="mt-1 text-gray-300">
+                  <span className="ml-2 text-gray-300">
                     {movie.genres.join(', ')}
-                  </div>
+                  </span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Actor:</span>
-                  <div className="mt-1 text-gray-300">
+                  <span className="ml-2 text-gray-300">
                     {movie.type === 'movie' ? 'Various Artists' : 'TV Cast'}
-                  </div>
+                  </span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Director:</span>
-                  <div className="mt-1 text-gray-300">
+                  <span className="ml-2 text-gray-300">
                     {movie.type === 'movie' ? 'Director Name' : 'Show Creator'}
-                  </div>
+                  </span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Country:</span>
-                  <div className="mt-1 text-gray-300">
+                  <span className="ml-2 text-gray-300">
                     {movie.countries.join(', ')}
-                  </div>
+                  </span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Duration:</span>
-                  <div className="mt-1 text-gray-300">{movie.duration} min</div>
+                  <span className="ml-2 text-gray-300">{movie.duration} min</span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Quality:</span>
-                  <div className="mt-1">
-                    <Badge className="bg-green-600 text-white text-xs">
-                      {movie.quality}
-                    </Badge>
-                  </div>
+                  <Badge className="ml-2 bg-green-600 text-white text-xs">
+                    {movie.quality}
+                  </Badge>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">Release:</span>
-                  <div className="mt-1 text-gray-300">{movie.year}</div>
+                  <span className="ml-2 text-gray-300">{movie.year}</span>
                 </div>
                 
                 <div>
                   <span className="text-accent-cyan font-medium">IMDb:</span>
-                  <div className="mt-1 text-yellow-400">{movie.rating?.toFixed(1) || 'N/A'}</div>
+                  <span className="ml-2 text-yellow-400">{movie.rating?.toFixed(1) || 'N/A'}</span>
                 </div>
-              </div>
-
-              {/* Trailer Button */}
-              <div className="pt-4">
-                <Button 
-                  variant="outline" 
-                  className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
-                >
-                  Trailer
-                </Button>
               </div>
 
               {/* Keywords */}
               <div>
-                <h3 className="text-accent-cyan font-medium mb-2">Keywords:</h3>
-                <div className="text-gray-400 text-sm">
+                <span className="text-accent-cyan font-medium">Keywords:</span>
+                <span className="ml-2 text-gray-400 text-sm">
                   {movie.genres.slice(0, 4).map(genre => genre.toLowerCase()).join(', ')}
-                </div>
+                </span>
               </div>
             </div>
           </div>
