@@ -18,6 +18,8 @@ export interface IStorage {
   getFeaturedMovie(): Promise<Movie | undefined>;
   getSuggestions(): Promise<Movie[]>;
   createMovie(movie: InsertMovie): Promise<Movie>;
+  updateMovie(id: number, movie: InsertMovie): Promise<Movie>;
+  deleteMovie(id: number): Promise<void>;
   
   // Episodes
   getEpisodes(movieId: number): Promise<Episode[]>;

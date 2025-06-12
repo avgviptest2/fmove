@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { filterSchema } from "@shared/schema";
+import { filterSchema, insertMovieSchema, insertEpisodeSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -89,6 +89,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const episodes = await storage.getEpisodes(movieId);
       res.json(episodes);
     } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create new movie
+  app.post("/api/movies", async (req, res) => {
+    try {
+      const movieData = insertMovieSchema.parse(req.body);
+      const movie = await storage.createMovie(movieData);
+      res.status(201).json(movie);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid movie data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update movie
+  app.put("/api/movies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const existingMovie = await storage.getMovie(id);
+      if (!existingMovie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      const movieData = insertMovieSchema.parse(req.body);
+      const updatedMovie = await storage.updateMovie(id, movieData);
+      res.json(updatedMovie);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid movie data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete movie
+  app.delete("/api/movies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const existingMovie = await storage.getMovie(id);
+      if (!existingMovie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      await storage.deleteMovie(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create episode for TV series
+  app.post("/api/movies/:id/episodes", async (req, res) => {
+    try {
+      const movieId = parseInt(req.params.id);
+      if (isNaN(movieId)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const movie = await storage.getMovie(movieId);
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      if (movie.type !== 'tv') {
+        return res.status(400).json({ message: "Not a TV series" });
+      }
+
+      const episodeData = insertEpisodeSchema.parse({
+        ...req.body,
+        movieId: movieId
+      });
+      
+      const episode = await storage.createEpisode(episodeData);
+      res.status(201).json(episode);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid episode data", errors: error.errors });
+      }
       res.status(500).json({ message: "Internal server error" });
     }
   });
