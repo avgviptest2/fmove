@@ -45,6 +45,19 @@ export class DatabaseStorage implements IStorage {
     return movie;
   }
 
+  async updateMovie(id: number, movieData: InsertMovie): Promise<Movie> {
+    const [movie] = await db
+      .update(movies)
+      .set(movieData)
+      .where(eq(movies.id, id))
+      .returning();
+    return movie;
+  }
+
+  async deleteMovie(id: number): Promise<void> {
+    await db.delete(movies).where(eq(movies.id, id));
+  }
+
   async getEpisodes(movieId: number): Promise<Episode[]> {
     return await db.select().from(episodes).where(eq(episodes.movieId, movieId));
   }
