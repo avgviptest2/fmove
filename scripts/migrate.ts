@@ -23,6 +23,7 @@ async function migrate() {
       backdrop TEXT,
       play_url TEXT,
       trailer_url TEXT,
+      embed_url TEXT,
       genres TEXT[] NOT NULL,
       countries TEXT[] NOT NULL,
       type TEXT NOT NULL,
