@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { insertMovieSchema, type Movie, type InsertMovie } from '@shared/schema';
 import { GENRES, COUNTRIES } from '@/lib/constants';
+import { z } from 'zod';
 
 export default function Admin() {
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
@@ -80,7 +81,6 @@ export default function Admin() {
 
       const response = await apiRequest(`/api/movies/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(movieData),
       });
 
