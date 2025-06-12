@@ -165,7 +165,7 @@ export default function Admin() {
             <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
             <p className="text-gray-400">Manage movies and TV series</p>
           </div>
-          
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={handleAddNew} className="bg-accent-cyan hover:bg-accent-cyan-hover">
@@ -179,7 +179,7 @@ export default function Admin() {
                   {editingMovie ? 'Edit Movie' : 'Add New Movie'}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -196,7 +196,7 @@ export default function Admin() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="type"
@@ -253,7 +253,7 @@ export default function Admin() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="duration"
@@ -272,7 +272,7 @@ export default function Admin() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="rating"
@@ -376,7 +376,7 @@ export default function Admin() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="backdrop"
@@ -400,6 +400,20 @@ export default function Admin() {
                         <FormLabel className="text-gray-300">Link Play Phim</FormLabel>
                         <FormControl>
                           <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://example.com/video.mp4" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                   <FormField
+                    control={form.control}
+                    name="trailer_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Link Trailer</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://youtube.com/watch?v=..." />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -510,7 +524,7 @@ export default function Admin() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -546,7 +560,7 @@ export default function Admin() {
               <div className="text-gray-400">Total Items</div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-dark-secondary border-gray-700">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-accent-cyan mb-2">
@@ -555,7 +569,7 @@ export default function Admin() {
               <div className="text-gray-400">Movies</div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-dark-secondary border-gray-700">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-accent-cyan mb-2">

@@ -18,6 +18,7 @@ async function migrate() {
       poster TEXT NOT NULL,
       backdrop TEXT,
       play_url TEXT,
+      trailer_url TEXT,
       genres TEXT[] NOT NULL,
       countries TEXT[] NOT NULL,
       type TEXT NOT NULL,

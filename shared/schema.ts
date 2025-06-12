@@ -13,6 +13,7 @@ export const movies = pgTable("movies", {
   poster: text("poster").notNull(), // poster image URL
   backdrop: text("backdrop"), // backdrop image URL
   play_url: text("play_url"), // video play URL
+  trailer_url: text("trailer_url"), // trailer video URL
   genres: text("genres").array().notNull(),
   countries: text("countries").array().notNull(),
   type: text("type").notNull(), // 'movie' or 'tv'
