@@ -73,11 +73,20 @@ export default function Admin() {
   });
 
   const updateMovieMutation = useMutation({
-    mutationFn: ({ id, movie }: { id: number, movie: InsertMovie }) => 
-      apiRequest(`/api/movies/${id}`, {
+    mutationFn: async (data: { id: number } & z.infer<typeof insertMovieSchema>) => {
+      const { id, ...movieData } = data;
+      console.log('API call - updating movie ID:', id);
+      console.log('API call - movie data:', movieData);
+
+      const response = await apiRequest(`/api/movies/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(movie)
-      }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movieData),
+      });
+
+      console.log('API response:', response);
+      return response;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/movies'] });
       setEditingMovie(null);
@@ -88,7 +97,7 @@ export default function Admin() {
         description: "Movie updated successfully"
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: "Failed to update movie",
@@ -117,11 +126,42 @@ export default function Admin() {
     }
   });
 
-  const onSubmit = (data: InsertMovie) => {
-    if (editingMovie) {
-      updateMovieMutation.mutate({ id: editingMovie.id, movie: data });
-    } else {
-      createMovieMutation.mutate(data);
+  const onSubmit = async (values: z.infer<typeof insertMovieSchema>) => {
+    try {
+      console.log('Form values before submit:', values);
+
+      if (editingMovie) {
+        console.log('Updating movie with ID:', editingMovie.id);
+        const updateData = {
+          id: editingMovie.id,
+          ...values,
+        };
+        console.log('Update data being sent:', updateData);
+
+        await updateMovieMutation.mutateAsync(updateData);
+        toast({
+          title: "Success",
+          description: "Movie updated successfully",
+        });
+      } else {
+        console.log('Creating new movie with data:', values);
+        await createMovieMutation.mutateAsync(values);
+        toast({
+          title: "Success", 
+          description: "Movie created successfully",
+        });
+      }
+      setIsDialogOpen(false);
+      setEditingMovie(null);
+      form.reset();
+    } catch (error) {
+      console.error('Movie operation error:', error);
+      console.error('Error details:', error.response?.data || error.message);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || error.message || "Failed to save movie",
+        variant: "destructive",
+      });
     }
   };
 
