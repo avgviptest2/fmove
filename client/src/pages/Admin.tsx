@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -180,6 +180,9 @@ export default function Admin() {
                 <DialogTitle className="text-white">
                   {editingMovie ? 'Edit Movie' : 'Add New Movie'}
                 </DialogTitle>
+                <DialogDescription className="text-gray-400">
+                  {editingMovie ? 'Update movie information' : 'Fill in the details to add a new movie or TV series'}
+                </DialogDescription>
               </DialogHeader>
 
               <Form {...form}>
