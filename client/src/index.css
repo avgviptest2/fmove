@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(187, 85%, 43%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  
+  /* FMovies specific colors */
+  --dark-primary: hsl(210, 40%, 8%);
+  --dark-secondary: hsl(210, 20%, 15%);
+  --dark-tertiary: hsl(210, 10%, 20%);
+  --accent-cyan: hsl(187, 85%, 43%);
+  --accent-cyan-hover: hsl(187, 85%, 35%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(187, 85%, 43%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased text-foreground;
+    background-color: var(--dark-primary);
+  }
+}
+
+@layer utilities {
+  .bg-dark-primary {
+    background-color: var(--dark-primary);
+  }
+  
+  .bg-dark-secondary {
+    background-color: var(--dark-secondary);
+  }
+  
+  .bg-dark-tertiary {
+    background-color: var(--dark-tertiary);
+  }
+  
+  .bg-accent-cyan {
+    background-color: var(--accent-cyan);
+  }
+  
+  .bg-accent-cyan-hover {
+    background-color: var(--accent-cyan-hover);
+  }
+  
+  .text-accent-cyan {
+    color: var(--accent-cyan);
+  }
+  
+  .border-accent-cyan {
+    border-color: var(--accent-cyan);
+  }
+  
+  .hover\:bg-accent-cyan-hover:hover {
+    background-color: var(--accent-cyan-hover);
+  }
+  
+  .hover\:text-accent-cyan:hover {
+    color: var(--accent-cyan);
+  }
+  
+  .focus\:border-accent-cyan:focus {
+    border-color: var(--accent-cyan);
+  }
+}

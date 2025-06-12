@@ -1,0 +1,98 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { filterSchema } from "@shared/schema";
+import { z } from "zod";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Get movies with filtering and pagination
+  app.get("/api/movies", async (req, res) => {
+    try {
+      const filters = filterSchema.parse({
+        search: req.query.search as string,
+        type: req.query.type as any,
+        genre: req.query.genre as string,
+        country: req.query.country as string,
+        year: req.query.year as string,
+        sort: req.query.sort as any,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+      });
+
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const result = await storage.getMovies({ ...filters, limit });
+      
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid filter parameters" });
+    }
+  });
+
+  // Get featured movie
+  app.get("/api/movies/featured", async (req, res) => {
+    try {
+      const movie = await storage.getFeaturedMovie();
+      if (!movie) {
+        return res.status(404).json({ message: "No featured movie found" });
+      }
+      res.json(movie);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get movie suggestions
+  app.get("/api/movies/suggestions", async (req, res) => {
+    try {
+      const suggestions = await storage.getSuggestions();
+      res.json(suggestions);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get single movie by ID
+  app.get("/api/movies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const movie = await storage.getMovie(id);
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      res.json(movie);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get episodes for a TV series
+  app.get("/api/movies/:id/episodes", async (req, res) => {
+    try {
+      const movieId = parseInt(req.params.id);
+      if (isNaN(movieId)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const movie = await storage.getMovie(movieId);
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      if (movie.type !== 'tv') {
+        return res.status(400).json({ message: "Not a TV series" });
+      }
+
+      const episodes = await storage.getEpisodes(movieId);
+      res.json(episodes);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
