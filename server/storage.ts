@@ -132,12 +132,36 @@ export class Storage implements IStorage {
     return movie;
   }
 
-  async updateMovie(id: number, movieData: InsertMovie): Promise<Movie> {
-    const [movie] = await db.update(movies)
-      .set(movieData)
+  async updateMovie(id: number, movie: InsertMovie): Promise<Movie> {
+    console.log("Updating movie with ID:", id);
+    console.log("Update data:", JSON.stringify(movie, null, 2));
+
+    const [updated] = await db.update(movies)
+      .set({
+        title: movie.title,
+        description: movie.description,
+        year: movie.year,
+        duration: movie.duration,
+        type: movie.type,
+        genres: movie.genres,
+        countries: movie.countries,
+        quality: movie.quality,
+        rating: movie.rating,
+        poster: movie.poster,
+        backdrop: movie.backdrop,
+        play_url: movie.play_url || null,
+        trailer_url: movie.trailer_url || null,
+        featured: movie.featured
+      })
       .where(eq(movies.id, id))
       .returning();
-    return movie;
+
+    if (!updated) {
+      throw new Error("Movie not found");
+    }
+
+    console.log("Updated movie:", JSON.stringify(updated, null, 2));
+    return updated;
   }
 
   async deleteMovie(id: number): Promise<void> {

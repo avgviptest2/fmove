@@ -126,14 +126,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Movie not found" });
       }
 
+      console.log("Update request body:", JSON.stringify(req.body, null, 2));
+      
       const movieData = insertMovieSchema.parse(req.body);
+      console.log("Parsed movie data:", JSON.stringify(movieData, null, 2));
+      
       const updatedMovie = await storage.updateMovie(id, movieData);
       res.json(updatedMovie);
     } catch (error) {
+      console.error("Update movie error:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid movie data", errors: error.errors });
       }
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   });
 
