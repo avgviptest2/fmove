@@ -4,6 +4,7 @@ import { Play, Download, Heart, Share2, Calendar, Star, Film } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MovieGrid from '@/components/MovieGrid';
+import TrailerModal from '@/components/TrailerModal';
 import type { Movie } from '@shared/schema';
 import { useState } from 'react';
 
@@ -11,6 +12,7 @@ export default function MovieDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const [isLiked, setIsLiked] = useState(false);
+  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
   const { data: movie, isLoading, error } = useQuery<Movie>({
     queryKey: [`/api/movies/${id}`],
@@ -46,6 +48,10 @@ export default function MovieDetail() {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     }
+  };
+
+  const handleTrailer = () => {
+    setIsTrailerOpen(true);
   };
 
   if (isLoading) {
@@ -121,9 +127,11 @@ export default function MovieDetail() {
               <div className="max-w-xs mx-auto lg:mx-0">
                 <Button 
                   variant="outline" 
+                  onClick={handleTrailer}
                   className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
                 >
-                  Trailer
+                  <Play className="w-4 h-4 mr-2" />
+                  Watch Trailer
                 </Button>
               </div>
             </div>
@@ -277,6 +285,16 @@ export default function MovieDetail() {
           </div>
         )}
       </div>
+
+      {/* Trailer Modal */}
+      {movie && (
+        <TrailerModal
+          isOpen={isTrailerOpen}
+          onClose={() => setIsTrailerOpen(false)}
+          trailerUrl={movie.trailer_url || ''}
+          movieTitle={movie.title}
+        />
+      )}
     </div>
   );
 }
