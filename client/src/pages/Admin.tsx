@@ -43,6 +43,7 @@ export default function Admin() {
       rating: 7.0,
       poster: '',
       backdrop: '',
+      play_url: '',
       featured: false
     }
   });
@@ -137,6 +138,7 @@ export default function Admin() {
       rating: movie.rating,
       poster: movie.poster,
       backdrop: movie.backdrop,
+      play_url: movie.play_url || '',
       featured: movie.featured
     });
     setIsDialogOpen(true);
@@ -295,6 +297,74 @@ export default function Admin() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
+                      name="genres"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-300">Genres</FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-tertiary border border-gray-600 rounded">
+                                {GENRES.map((genre) => (
+                                  <label key={genre} className="flex items-center space-x-2 text-sm">
+                                    <input
+                                      type="checkbox"
+                                      checked={field.value?.includes(genre) || false}
+                                      onChange={(e) => {
+                                        const updatedGenres = e.target.checked
+                                          ? [...(field.value || []), genre]
+                                          : (field.value || []).filter(g => g !== genre);
+                                        field.onChange(updatedGenres);
+                                      }}
+                                      className="rounded"
+                                    />
+                                    <span className="text-gray-300">{genre}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="countries"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-300">Countries</FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-tertiary border border-gray-600 rounded">
+                                {COUNTRIES.map((country) => (
+                                  <label key={country} className="flex items-center space-x-2 text-sm">
+                                    <input
+                                      type="checkbox"
+                                      checked={field.value?.includes(country) || false}
+                                      onChange={(e) => {
+                                        const updatedCountries = e.target.checked
+                                          ? [...(field.value || []), country]
+                                          : (field.value || []).filter(c => c !== country);
+                                        field.onChange(updatedCountries);
+                                      }}
+                                      className="rounded"
+                                    />
+                                    <span className="text-gray-300">{country}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
                       name="poster"
                       render={({ field }) => (
                         <FormItem>
@@ -317,6 +387,42 @@ export default function Admin() {
                             <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="play_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Link Play Phim</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://example.com/video.mp4" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex items-center space-x-2">
+                    <FormField
+                      control={form.control}
+                      name="featured"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <input
+                              type="checkbox"
+                              checked={field.value}
+                              onChange={field.onChange}
+                              className="rounded"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-gray-300">
+                            Featured Movie
+                          </FormLabel>
                         </FormItem>
                       )}
                     />
