@@ -302,17 +302,17 @@ export default function MovieDetail() {
             />
           </div>
         )}
-      </div>
 
-      {/* Trailer Modal */}
-      {movie && (
-        <TrailerModal
-          isOpen={isTrailerOpen}
-          onClose={() => setIsTrailerOpen(false)}
-          trailerUrl={movie.trailer_url || ''}
-          movieTitle={movie.title}
-        />
-      )}
+        {/* Trailer Modal */}
+        {movie && (
+          <TrailerModal
+            isOpen={isTrailerOpen}
+            onClose={() => setIsTrailerOpen(false)}
+            trailerUrl={movie.trailer_url || ''}
+            movieTitle={movie.title}
+          />
+        )}
+      </div>
     </div>
   );
 }
