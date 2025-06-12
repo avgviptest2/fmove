@@ -9,12 +9,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/movies", async (req, res) => {
     try {
       const filters = filterSchema.parse({
-        search: req.query.search as string,
-        type: req.query.type as any,
-        genre: req.query.genre as string,
-        country: req.query.country as string,
-        year: req.query.year as string,
-        sort: req.query.sort as any,
+        search: req.query.search || undefined,
+        type: req.query.type || undefined,
+        genre: req.query.genre || undefined,
+        country: req.query.country || undefined,
+        year: req.query.year || undefined,
+        sort: req.query.sort || undefined,
         page: req.query.page ? parseInt(req.query.page as string) : undefined,
       });
 
@@ -23,7 +23,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(result);
     } catch (error) {
-      res.status(400).json({ message: "Invalid filter parameters" });
+      console.error("Movies filter error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid filter parameters", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
@@ -36,6 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(movie);
     } catch (error) {
+      console.error("Featured movie error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -46,6 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const suggestions = await storage.getSuggestions();
       res.json(suggestions);
     } catch (error) {
+      console.error("Suggestions error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
