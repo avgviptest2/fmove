@@ -42,8 +42,8 @@ export const insertMovieSchema = z.object({
   rating: z.number().min(0).max(10).default(7.0),
   poster: z.string().url(),
   backdrop: z.string().url(),
-  play_url: z.string().url().optional(),
-  trailer_url: z.string().url().optional(),
+  play_url: z.union([z.string().url(), z.string().length(0)]).optional().transform(val => val === '' ? undefined : val),
+  trailer_url: z.union([z.string().url(), z.string().length(0)]).optional().transform(val => val === '' ? undefined : val),
   featured: z.boolean().default(false)
 });
 
