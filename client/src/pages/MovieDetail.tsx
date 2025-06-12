@@ -17,10 +17,12 @@ export default function MovieDetail() {
     enabled: !!id,
   });
 
-  const { data: relatedMovies } = useQuery<Movie[]>({
-    queryKey: ['/api/movies?limit=6'],
+  const { data: relatedMoviesData } = useQuery<{movies: Movie[], total: number, pages: number}>({
+    queryKey: ['/api/movies', { limit: 6 }],
     enabled: !!movie,
   });
+
+  const relatedMovies = relatedMoviesData?.movies || [];
 
   const handleWatchNow = () => {
     if (movie) {
@@ -100,8 +102,8 @@ export default function MovieDetail() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Movie Poster */}
-          <div className="lg:col-span-3">
-            <div className="relative group">
+          <div className="lg:col-span-2">
+            <div className="relative group max-w-xs mx-auto lg:mx-0">
               <img 
                 src={movie.poster} 
                 alt={movie.title}
@@ -150,12 +152,8 @@ export default function MovieDetail() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-accent-cyan font-medium">Genres:</span>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {movie.genres.map((genre) => (
-                      <span key={genre} className="text-gray-300">
-                        {genre}
-                      </span>
-                    )).reduce((prev, curr, index) => [prev, index > 0 ? ', ' : '', curr])}
+                  <div className="mt-1 text-gray-300">
+                    {movie.genres.join(', ')}
                   </div>
                 </div>
                 
@@ -218,12 +216,8 @@ export default function MovieDetail() {
               {/* Keywords */}
               <div>
                 <h3 className="text-accent-cyan font-medium mb-2">Keywords:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {movie.genres.slice(0, 4).map((genre) => (
-                    <span key={genre} className="text-gray-400 text-sm">
-                      {genre.toLowerCase()}
-                    </span>
-                  )).reduce((prev, curr, index) => [prev, index > 0 ? ', ' : '', curr])}
+                <div className="text-gray-400 text-sm">
+                  {movie.genres.slice(0, 4).map(genre => genre.toLowerCase()).join(', ')}
                 </div>
               </div>
             </div>
