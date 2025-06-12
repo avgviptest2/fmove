@@ -289,7 +289,6 @@ export default function MovieDetail() {
             </div>
           </div>
         </div>
-      </div>
 
         {/* Related Movies */}
         {relatedMovies && relatedMovies.length > 0 && (
