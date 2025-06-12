@@ -123,32 +123,47 @@ export default function Player() {
       >
         {/* Video Player */}
         <div className="w-full h-full relative bg-black">
-          {movie.embed_url && isPlaying ? (
-            <iframe
-              src={movie.embed_url}
-              title={`${movie.title} - Player`}
-              className="w-full h-full"
-              frameBorder="0"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
+          {movie.embed_url ? (
+            isPlaying ? (
+              <iframe
+                src={movie.embed_url}
+                title={`${movie.title} - Player`}
+                className="w-full h-full"
+                frameBorder="0"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            ) : (
+              <div 
+                className="w-full h-full bg-cover bg-center relative"
+                style={{
+                  backgroundImage: movie.backdrop ? `url(${movie.backdrop})` : undefined,
+                }}
+              >
+                <div className="absolute inset-0 bg-black/30" />
+                
+                {/* Center Play Button (when paused) */}
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                  <Button
+                    onClick={handlePlayPause}
+                    size="lg"
+                    className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full w-20 h-20 border border-white/20 transition-all duration-300 hover:scale-110"
+                  >
+                    <Play className="w-10 h-10 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )
           ) : (
-            <div 
-              className="w-full h-full bg-cover bg-center relative"
-              style={{
-                backgroundImage: movie.backdrop ? `url(${movie.backdrop})` : undefined,
-              }}
-            >
-              <div className="absolute inset-0 bg-black/30" />
-              
-              {/* Center Play Button (when paused) */}
-              <div className="absolute inset-0 flex items-center justify-center z-20">
-                <Button
-                  onClick={handlePlayPause}
-                  size="lg"
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full w-20 h-20 border border-white/20 transition-all duration-300 hover:scale-110"
+            <div className="w-full h-full flex items-center justify-center bg-gray-900">
+              <div className="text-center">
+                <div className="text-red-400 text-xl mb-4">Video not available</div>
+                <p className="text-gray-400">No embed URL found for this movie</p>
+                <Button 
+                  onClick={() => setLocation(`/movie/${id}`)}
+                  className="mt-4 bg-accent-cyan hover:bg-accent-cyan-hover"
                 >
-                  <Play className="w-10 h-10 ml-1" />
+                  Back to Details
                 </Button>
               </div>
             </div>
