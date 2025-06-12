@@ -40,14 +40,6 @@ export default function TrailerModal({ isOpen, onClose, trailerUrl, movieTitle }
           <DialogTitle className="text-white text-xl">
             {movieTitle} - Trailer
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-white"
-          >
-            <X className="w-4 h-4" />
-          </Button>
         </DialogHeader>
         
         <div className="aspect-video bg-black rounded-lg overflow-hidden">
