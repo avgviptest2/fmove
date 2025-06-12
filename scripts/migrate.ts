@@ -5,9 +5,13 @@ import { sql } from "drizzle-orm";
 async function migrate() {
   console.log("Creating database tables...");
   
-  // Create movies table
+  // Drop existing tables to recreate with correct schema
+  await db.execute(sql`DROP TABLE IF EXISTS episodes CASCADE`);
+  await db.execute(sql`DROP TABLE IF EXISTS movies CASCADE`);
+  
+  // Create movies table with all columns
   await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS movies (
+    CREATE TABLE movies (
       id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
@@ -28,7 +32,7 @@ async function migrate() {
 
   // Create episodes table
   await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS episodes (
+    CREATE TABLE episodes (
       id SERIAL PRIMARY KEY,
       movie_id INTEGER REFERENCES movies(id) NOT NULL,
       season INTEGER NOT NULL,
