@@ -75,6 +75,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get embed URL for movie
+  app.get("/api/movies/:id/embed", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const movie = await storage.getMovie(id);
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      const embedUrl = `${req.protocol}://${req.get('host')}/embed/${id}`;
+      res.json({ embedUrl, title: movie.title });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get episodes for a TV series
   app.get("/api/movies/:id/episodes", async (req, res) => {
     try {

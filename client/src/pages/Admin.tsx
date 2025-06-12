@@ -46,7 +46,8 @@ export default function Admin() {
       backdrop: '',
       play_url: '',
       trailer_url: '',
-      featured: false
+      featured: false,
+      embed_url: ''
     }
   });
 
@@ -181,7 +182,8 @@ export default function Admin() {
       backdrop: movie.backdrop,
       play_url: movie.play_url || '',
       trailer_url: movie.trailer_url || '',
-      featured: movie.featured
+      featured: movie.featured,
+      embed_url: movie.embed_url || ''
     });
     setIsDialogOpen(true);
   };
@@ -459,6 +461,20 @@ export default function Admin() {
                         <FormLabel className="text-gray-300">Link Trailer</FormLabel>
                         <FormControl>
                           <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://youtube.com/watch?v=..." />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="embed_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Embed URL</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://example.com/embed/video123" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

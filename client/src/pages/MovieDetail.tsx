@@ -50,6 +50,14 @@ export default function MovieDetail() {
     }
   };
 
+  const handleEmbed = () => {
+    if (movie) {
+      const embedCode = `<iframe src="${window.location.origin}/embed/${movie.id}" width="800" height="450" frameborder="0" allowfullscreen></iframe>`;
+      navigator.clipboard.writeText(embedCode);
+      alert('Embed code copied to clipboard!');
+    }
+  };
+
   const handleTrailer = () => {
     setIsTrailerOpen(true);
   };
@@ -268,6 +276,16 @@ export default function MovieDetail() {
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEmbed}
+                className="w-full mt-2 border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
+              >
+                📺 Get Embed Code
+              </Button>
               </div>
             </div>
           </div>

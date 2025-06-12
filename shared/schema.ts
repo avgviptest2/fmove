@@ -14,6 +14,7 @@ export const movies = pgTable("movies", {
   backdrop: text("backdrop"), // backdrop image URL
   play_url: text("play_url"), // video play URL
   trailer_url: text("trailer_url"), // trailer video URL
+  embed_url: text("embed_url"), // embeddable player URL
   genres: text("genres").array().notNull(),
   countries: text("countries").array().notNull(),
   type: text("type").notNull(), // 'movie' or 'tv'
@@ -44,6 +45,7 @@ export const insertMovieSchema = z.object({
   backdrop: z.string().url(),
   play_url: z.union([z.string().url(), z.string().length(0)]).optional().transform(val => val === '' ? undefined : val),
   trailer_url: z.union([z.string().url(), z.string().length(0)]).optional().transform(val => val === '' ? undefined : val),
+  embed_url: z.union([z.string().url(), z.string().length(0)]).optional().transform(val => val === '' ? undefined : val),
   featured: z.boolean().default(false)
 });
 

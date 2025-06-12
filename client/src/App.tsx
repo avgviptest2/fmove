@@ -9,9 +9,8 @@ import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
 import Movies from "@/pages/Movies";
 import MovieDetail from "@/pages/MovieDetail";
-import Player from "@/pages/Player";
-import Genres from "@/pages/Genres";
-import Countries from "@/pages/Countries";
+import Player from './pages/Player';
+import EmbedPlayer from './pages/EmbedPlayer';
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
@@ -34,8 +33,7 @@ function Router() {
         </Route>
         <Route path="/movie/:id" component={MovieDetail} />
         <Route path="/player/:id" component={Player} />
-        <Route path="/genres" component={Genres} />
-        <Route path="/countries" component={Countries} />
+        <Route path="/embed/:id" component={EmbedPlayer} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
