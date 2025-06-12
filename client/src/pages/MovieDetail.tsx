@@ -286,10 +286,10 @@ export default function MovieDetail() {
               >
                 📺 Get Embed Code
               </Button>
-              </div>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Related Movies */}
         {relatedMovies && relatedMovies.length > 0 && (
