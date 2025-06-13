@@ -1,4 +1,4 @@
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Download, Share2, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
@@ -447,35 +447,6 @@ export default function MoviePlayer({
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {/* Quality Selection */}
-                  {availableQualities.length > 1 && (
-                    <div className="relative group">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-white hover:bg-white/20 rounded p-1.5"
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                      <div className="absolute bottom-full right-0 mb-2 bg-black/90 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
-                        <div className="text-white text-sm mb-2">Quality</div>
-                        {availableQualities.map((quality) => (
-                          <button
-                            key={quality}
-                            onClick={() => changeQuality(quality)}
-                            className={`block w-full text-left px-2 py-1 text-sm rounded ${
-                              currentQuality === quality
-                                ? 'bg-accent-cyan text-white'
-                                : 'text-gray-300 hover:bg-white/20'
-                            }`}
-                          >
-                            {quality}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Fullscreen */}
                   <Button
                     onClick={toggleFullscreen}
@@ -484,22 +455,6 @@ export default function MoviePlayer({
                     className="text-white hover:bg-white/20 rounded p-1.5"
                   >
                     <Maximize className="w-4 h-4" />
-                  </Button>
-
-                  {/* Additional Controls */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
