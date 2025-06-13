@@ -133,7 +133,8 @@ export default function MovieDetail() {
           </div>
         </div>
       ) : (
-        {/* Video Player và Control UI Container */}
+      <>
+        {/* Video Player and Control UI Container */}
         <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
           {/* Video Player */}
           {movie.embed_url ? (
@@ -228,8 +229,8 @@ export default function MovieDetail() {
           </Button>
         </div>
 
-        {/* Server và Quality Selection - Div riêng */}
-        <div className="w-full mt-4 bg-dark-secondary/50 rounded-lg p-4 border border-gray-700/50">
+        {/* Server and  Quality Selection - Div rieng */}
+        <div className="w-full bg-black/95   p-4  ">
           <div className="flex flex-wrap items-center gap-4">
             {/* Server Selection */}
             <div className="flex items-center gap-2">
@@ -264,7 +265,8 @@ export default function MovieDetail() {
             </div>
           </div>
         </div>
-      )}
+          </>
+  )}
 
       {/* Main Content */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
