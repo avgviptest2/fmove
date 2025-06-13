@@ -1,4 +1,3 @@
-
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -9,7 +8,6 @@ import {
   Calendar,
   Star,
   Film,
-  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +49,7 @@ export default function MovieDetail() {
   };
 
   const handleDownload = () => {
+    // Demo functionality
     alert("Download feature coming soon!");
   };
 
@@ -100,21 +99,9 @@ export default function MovieDetail() {
 
   return (
     <div className="min-h-screen bg-dark-primary">
-      {/* Mobile Back Button */}
-      <div className="lg:hidden p-4">
-        <Button
-          variant="ghost"
-          onClick={() => setLocation("/movies")}
-          className="text-gray-400 hover:text-white"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
-        </Button>
-      </div>
-
-      {/* Hero Backdrop - Responsive Height */}
+      {/* Hero Backdrop */}
       <div
-        className="relative h-64 sm:h-80 lg:h-96 bg-cover bg-center"
+        className="container relative h-96 mx-auto  bg-cover bg-center"
         style={{
           backgroundImage: movie.backdrop
             ? `url(${movie.backdrop})`
@@ -128,111 +115,171 @@ export default function MovieDetail() {
           <Button
             onClick={handleWatchNow}
             size="lg"
-            className="bg-accent-cyan/90 hover:bg-accent-cyan text-white rounded-full w-12 h-12 sm:w-16 sm:h-16 shadow-2xl transition-all duration-300 hover:scale-110"
+            className="bg-accent-cyan/90 hover:bg-accent-cyan text-white rounded-full w-16 h-16 shadow-2xl transition-all duration-300 hover:scale-110"
           >
-            <Play className="w-6 h-6 sm:w-8 sm:h-8 ml-1" />
+            <Play className="w-8 h-8 ml-1" />
           </Button>
         </div>
       </div>
 
-      {/* Main Content - Responsive Container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-          {/* Movie Poster - Responsive Layout */}
-          <div className="lg:col-span-3 xl:col-span-2">
-            <div className="flex flex-row lg:flex-col gap-4">
-              {/* Poster */}
-              <div className="flex-shrink-0 w-32 sm:w-40 lg:w-full">
-                <div className="relative group">
-                  <img
-                    src={movie.poster}
-                    alt={movie.title}
-                    className="w-full rounded-lg shadow-xl transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <Badge className="bg-green-600 text-white font-semibold text-xs">
-                      {movie.quality}
-                    </Badge>
-                  </div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Movie Poster */}
+          <div className="lg:col-span-2">
+            <div className="space-y-4">
+              <div className="relative group max-w-xs mx-auto lg:mx-0">
+                <img
+                  src={movie.poster}
+                  alt={movie.title}
+                  className="w-full rounded-lg shadow-xl transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 left-3">
+                  <Badge className="bg-green-600 text-white font-semibold">
+                    {movie.quality}
+                  </Badge>
                 </div>
               </div>
 
-              {/* Action Buttons - Mobile/Tablet Layout */}
-              <div className="flex-1 lg:hidden">
-                <div className="space-y-3">
-                  <Button
-                    onClick={handleWatchNow}
-                    className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-2.5 text-sm"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Watch Now
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    onClick={handleTrailer}
-                    className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white text-sm"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Trailer
-                  </Button>
-
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsLiked(!isLiked)}
-                      className={`flex-1 ${isLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500 text-xs`}
-                    >
-                      <Heart
-                        className={`w-4 h-4 mr-1 ${isLiked ? "fill-current" : ""}`}
-                      />
-                      Like
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleShare}
-                      className="flex-1 text-gray-400 hover:text-accent-cyan text-xs"
-                    >
-                      <Share2 className="w-4 h-4 mr-1" />
-                      Share
-                    </Button>
-                  </div>
-                </div>
+              {/* Trailer Button under Poster */}
+              <div className="max-w-xs mx-auto lg:mx-0">
+                <Button
+                  variant="outline"
+                  onClick={handleTrailer}
+                  className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Watch Trailer
+                </Button>
               </div>
             </div>
+          </div>
 
-            {/* Desktop Action Buttons */}
-            <div className="hidden lg:block mt-4 space-y-3">
+          {/* Movie Information */}
+          <div className="lg:col-span-6">
+            <div className="space-y-6">
+              {/* Title and Basic Info */}
+              <div>
+                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
+                  {movie.title}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-4 text-gray-300 mb-4">
+                  <div className="flex items-center space-x-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>{movie.year}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Film className="w-4 h-4" />
+                    <span>{movie.duration} min</span>
+                  </div>
+                  {movie.rating && (
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400 font-semibold">
+                        {movie.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-gray-300 leading-relaxed mb-6">
+                  {movie.description}
+                </p>
+              </div>
+
+              {/* Movie Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div>
+                  <span className="text-accent-cyan font-medium">Genres:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.genres.join(", ")}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Actor:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.type === "movie" ? "Various Artists" : "TV Cast"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">
+                    Director:
+                  </span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.type === "movie" ? "Director Name" : "Show Creator"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Country:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.countries.join(", ")}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">
+                    Duration:
+                  </span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.duration} min
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Quality:</span>
+                  <Badge className="ml-2 bg-green-600 text-white text-xs">
+                    {movie.quality}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Release:</span>
+                  <span className="ml-2 text-gray-300">{movie.year}</span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">IMDb:</span>
+                  <span className="ml-2 text-yellow-400">
+                    {movie.rating?.toFixed(1) || "N/A"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Keywords */}
+              <div>
+                <span className="text-accent-cyan font-medium">Keywords:</span>
+                <span className="ml-2 text-gray-400 text-sm">
+                  {movie.genres
+                    .slice(0, 4)
+                    .map((genre) => genre.toLowerCase())
+                    .join(", ")}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="lg:col-span-3">
+            <div className="space-y-3">
               <Button
                 onClick={handleWatchNow}
                 className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
               >
-                <Play className="w-4 h-4 mr-2" />
                 Stream in HD
               </Button>
 
               <Button
-                variant="outline"
-                onClick={handleTrailer}
-                className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Watch Trailer
-              </Button>
-
-              <Button
                 onClick={handleDownload}
-                variant="outline"
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Download
+                Download in HD
               </Button>
 
-              <div className="flex space-x-2 mt-4">
+              <div className="flex space-x-2 mt-6">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -257,108 +304,17 @@ export default function MovieDetail() {
               </div>
             </div>
           </div>
-
-          {/* Movie Information - Responsive Layout */}
-          <div className="lg:col-span-9 xl:col-span-10">
-            <div className="space-y-4 lg:space-y-6">
-              {/* Title and Basic Info */}
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight">
-                  {movie.title}
-                </h1>
-
-                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-gray-300 mb-4 text-sm sm:text-base">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>{movie.year}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Film className="w-4 h-4" />
-                    <span>{movie.duration} min</span>
-                  </div>
-                  {movie.rating && (
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400 font-semibold">
-                        {movie.rating.toFixed(1)}
-                      </span>
-                    </div>
-                  )}
-                  <Badge className="bg-gray-700 text-gray-300">
-                    {movie.type === "movie" ? "Movie" : "TV Series"}
-                  </Badge>
-                </div>
-
-                <p className="text-gray-300 leading-relaxed mb-4 lg:mb-6 text-sm sm:text-base">
-                  {movie.description}
-                </p>
-              </div>
-
-              {/* Movie Details - Responsive Grid */}
-              <div className="bg-dark-secondary rounded-lg p-4 lg:p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Movie Details
-                </h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3 text-sm">
-                  <div>
-                    <span className="text-accent-cyan font-medium">Genres:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {movie.genres.map((genre) => (
-                        <Badge key={genre} variant="secondary" className="bg-gray-700 text-gray-300 text-xs">
-                          {genre}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-accent-cyan font-medium">Countries:</span>
-                    <div className="text-gray-300 mt-1">
-                      {movie.countries.join(", ")}
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-accent-cyan font-medium">Duration:</span>
-                    <div className="text-gray-300 mt-1">
-                      {movie.duration} minutes
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-accent-cyan font-medium">Quality:</span>
-                    <Badge className="ml-2 bg-green-600 text-white text-xs">
-                      {movie.quality}
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <span className="text-accent-cyan font-medium">Release:</span>
-                    <div className="text-gray-300 mt-1">{movie.year}</div>
-                  </div>
-
-                  <div>
-                    <span className="text-accent-cyan font-medium">IMDb:</span>
-                    <span className="ml-2 text-yellow-400">
-                      {movie.rating?.toFixed(1) || "N/A"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Related Movies - Responsive */}
+        {/* Related Movies */}
         {relatedMovies && relatedMovies.length > 0 && (
-          <div className="mt-12 lg:mt-16">
+          <div className="mt-16">
             <MovieGrid
               movies={relatedMovies
                 .filter((m) => m.id !== movie.id)
                 .slice(0, 6)}
-              title="You May Also Like"
-              onWatch={(movieId) => setLocation(`/player/${movieId}`)}
+              title="Related Movies"
+              onWatch={(movieId) => setLocation(`/movie/${movieId}`)}
               onDetails={(movieId) => setLocation(`/movie/${movieId}`)}
             />
           </div>
