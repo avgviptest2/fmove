@@ -57,7 +57,7 @@ export default function Home() {
             FMOVIES
           </div>
           <p className="text-gray-300 mb-8">fmovies.to - Just a better place for watching online movies for free!</p>
-          
+
           <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex">
             <Input
               type="text"
@@ -74,7 +74,7 @@ export default function Home() {
               Search
             </Button>
           </form>
-          
+
           <div className="mt-4">
             <Button 
               variant="link" 

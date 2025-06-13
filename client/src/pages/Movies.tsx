@@ -19,7 +19,7 @@ export default function Movies() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const newFilters: MovieFilters = { page: 1 };
-    
+
     if (params.get('search')) newFilters.search = params.get('search')!;
     if (params.get('type')) newFilters.type = params.get('type') as any;
     if (params.get('genre')) newFilters.genre = params.get('genre')!;
@@ -27,7 +27,7 @@ export default function Movies() {
     if (params.get('year')) newFilters.year = params.get('year')!;
     if (params.get('sort')) newFilters.sort = params.get('sort') as any;
     if (params.get('page')) newFilters.page = parseInt(params.get('page')!) || 1;
-    
+
     setFilters(newFilters);
   }, []);
 
@@ -46,7 +46,7 @@ export default function Movies() {
   const handleFiltersChange = (newFilters: MovieFilters) => {
     const updatedFilters = { ...newFilters, page: 1 };
     setFilters(updatedFilters);
-    
+
     // Update URL
     const params = new URLSearchParams();
     Object.entries(updatedFilters).forEach(([key, value]) => {
@@ -54,7 +54,7 @@ export default function Movies() {
         params.append(key, value.toString());
       }
     });
-    
+
     const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ''}`;
     window.history.pushState({}, '', newUrl);
   };
@@ -62,14 +62,14 @@ export default function Movies() {
   const handlePageChange = (page: number) => {
     const newFilters = { ...filters, page };
     setFilters(newFilters);
-    
+
     const params = new URLSearchParams();
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== 'all' && value !== '') {
         params.append(key, value.toString());
       }
     });
-    
+
     const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ''}`;
     window.history.pushState({}, '', newUrl);
   };
@@ -103,7 +103,7 @@ export default function Movies() {
               <MovieGrid
                 movies={movies}
                 title={filters.search ? `Search Results for "${filters.search}"` : 'All Movies'}
-                onWatch={handleWatchNow}
+                onWatch={(movieId) => setLocation(`/player/${movieId}`)}
                 onDetails={handleMovieDetails}
               />
 
@@ -120,7 +120,7 @@ export default function Movies() {
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
-                    
+
                     {/* Page numbers */}
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let page;
@@ -133,7 +133,7 @@ export default function Movies() {
                       } else {
                         page = currentPage - 2 + i;
                       }
-                      
+
                       return (
                         <Button
                           key={page}
@@ -150,7 +150,7 @@ export default function Movies() {
                         </Button>
                       );
                     })}
-                    
+
                     {totalPages > 5 && currentPage < totalPages - 2 && (
                       <>
                         <span className="px-3 py-2 text-sm text-gray-400">...</span>
@@ -164,7 +164,7 @@ export default function Movies() {
                         </Button>
                       </>
                     )}
-                    
+
                     <Button
                       variant="ghost"
                       size="sm"
@@ -184,3 +184,4 @@ export default function Movies() {
     </div>
   );
 }
+`
