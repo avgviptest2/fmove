@@ -160,6 +160,45 @@ export default function MovieDetail() {
             </div>
           )}
 
+          {/* Server and Quality Selection - Top Section */}
+          <div className="absolute top-0 left-0 right-0 z-20">
+            <div className="bg-gradient-to-b from-black/90 via-black/70 to-transparent p-3 sm:p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Server Selection */}
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm font-medium">Server:</span>
+                  <div className="flex gap-1">
+                    <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
+                      Server 1
+                    </Button>
+                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                      Server 2
+                    </Button>
+                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                      Server 3
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Quality Selection */}
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm font-medium">Quality:</span>
+                  <div className="flex gap-1">
+                    <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
+                      Full HD
+                    </Button>
+                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                      HD
+                    </Button>
+                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                      720p
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Enhanced Player Controls Overlay */}
           <div className="absolute bottom-0 left-0 right-0">
             {/* Progress Bar */}
@@ -172,7 +211,7 @@ export default function MovieDetail() {
             {/* Controls Container */}
             <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
               {/* Main Controls Row */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 {/* Left Controls */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   <Button
@@ -211,32 +250,6 @@ export default function MovieDetail() {
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
-              </div>
-
-              {/* Server and Quality Selection */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center space-x-1 text-xs text-gray-300">
-                  <span>Server:</span>
-                </div>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-2 py-1 h-auto rounded transition-colors">
-                  Server 1
-                </Button>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-2 py-1 h-auto rounded transition-colors">
-                  Server 2
-                </Button>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-2 py-1 h-auto rounded transition-colors">
-                  Server 3
-                </Button>
-                
-                <div className="flex items-center space-x-1 text-xs text-gray-300 ml-2">
-                  <span>Quality:</span>
-                </div>
-                <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-2 py-1 h-auto rounded font-semibold transition-colors">
-                  Full HD
-                </Button>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-2 py-1 h-auto rounded transition-colors">
-                  HD
-                </Button>
               </div>
             </div>
           </div>
