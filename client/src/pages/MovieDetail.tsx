@@ -125,13 +125,13 @@ export default function MovieDetail() {
 
       {/* Main Content */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Mobile-first layout using flex-col, then grid on larger screens */}
-        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
+        {/* Responsive layout optimized for 768px-1024px */}
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-6 lg:gap-8">
           
-          {/* Movie Poster - Full width on mobile, fixed column on desktop */}
-          <div className="lg:col-span-3 xl:col-span-2">
-            <div className="flex flex-col items-center lg:items-start space-y-4">
-              <div className="relative group w-48 sm:w-56 md:w-64 lg:w-full max-w-xs">
+          {/* Movie Poster - Optimized for tablet and small desktop */}
+          <div className="md:col-span-4 lg:col-span-3 xl:col-span-2">
+            <div className="flex flex-col items-center md:items-start space-y-4">
+              <div className="relative group w-48 sm:w-56 md:w-full max-w-xs lg:max-w-none">
                 <img
                   src={movie.poster}
                   alt={movie.title}
@@ -145,7 +145,7 @@ export default function MovieDetail() {
               </div>
 
               {/* Trailer Button */}
-              <div className="w-48 sm:w-56 md:w-64 lg:w-full max-w-xs">
+              <div className="w-48 sm:w-56 md:w-full max-w-xs lg:max-w-none">
                 <Button
                   variant="outline"
                   onClick={handleTrailer}
@@ -158,16 +158,16 @@ export default function MovieDetail() {
             </div>
           </div>
 
-          {/* Movie Information - Flexible width */}
-          <div className="lg:col-span-6 xl:col-span-7">
-            <div className="space-y-4 sm:space-y-6">
+          {/* Movie Information - Optimized width distribution */}
+          <div className="md:col-span-5 lg:col-span-6 xl:col-span-7">
+            <div className="space-y-4 md:space-y-5 lg:space-y-6">
               {/* Title and Basic Info */}
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight">
                   {movie.title}
                 </h1>
 
-                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base text-gray-300 mb-4">
+                <div className="flex flex-wrap items-center gap-3 md:gap-3 lg:gap-4 text-sm md:text-sm lg:text-base text-gray-300 mb-4">
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4" />
                     <span>{movie.year}</span>
@@ -186,13 +186,13 @@ export default function MovieDetail() {
                   )}
                 </div>
 
-                <p className="text-gray-300 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
+                <p className="text-gray-300 leading-relaxed mb-4 md:mb-5 lg:mb-6 text-sm md:text-sm lg:text-base">
                   {movie.description}
                 </p>
               </div>
 
-              {/* Movie Details - Responsive grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 text-sm">
+              {/* Movie Details - Optimized for medium screens */}
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-6 gap-y-2 text-sm">
                 <div>
                   <span className="text-accent-cyan font-medium">Genres:</span>
                   <span className="ml-2 text-gray-300">
@@ -259,8 +259,8 @@ export default function MovieDetail() {
                 </span>
               </div>
 
-              {/* Action Buttons on mobile - show here */}
-              <div className="lg:hidden space-y-3 mt-6">
+              {/* Action Buttons on mobile and tablet - show here */}
+              <div className="md:hidden space-y-3 mt-6">
                 <Button
                   onClick={handleWatchNow}
                   className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
@@ -302,24 +302,24 @@ export default function MovieDetail() {
             </div>
           </div>
 
-          {/* Action Buttons - Desktop only */}
-          <div className="hidden lg:block lg:col-span-3 xl:col-span-3">
+          {/* Action Buttons - Tablet and Desktop */}
+          <div className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-3">
             <div className="space-y-3 sticky top-4">
               <Button
                 onClick={handleWatchNow}
-                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
+                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3 text-sm md:text-base"
               >
                 Stream in HD
               </Button>
 
               <Button
                 onClick={handleDownload}
-                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
+                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3 text-sm md:text-base"
               >
                 Download in HD
               </Button>
 
-              <div className="flex space-x-2 mt-6">
+              <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-6">
                 <Button
                   variant="ghost"
                   size="sm"
