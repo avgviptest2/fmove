@@ -37,10 +37,13 @@ export default function TrailerModal({
     ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
     : null;
 
-  const handlePlay = () => {
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsPlaying(true);
   };
-
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
   const handleClose = () => {
     setIsPlaying(false);
     onClose();
@@ -48,7 +51,18 @@ export default function TrailerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl w-full bg-black border-gray-800">
+      <DialogContent
+        className="max-w-4xl w-full bg-black border-gray-800"
+        onClick={handleClick}
+        onPointerDownOutside={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
+        onEscapeKeyDown={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-white text-xl">
             {movieTitle} - Trailer
