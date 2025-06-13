@@ -134,97 +134,92 @@ export default function MovieDetail() {
         </div>
       ) : (
         <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
-          {/* Video Player */}
-          {movie.embed_url ? (
-            <iframe
-              src={movie.embed_url}
-              title={`${movie.title} - Player`}
-              className="w-full h-full rounded-lg"
-              frameBorder="0"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-              <div className="text-center p-8">
-                <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <Play className="w-8 h-8 text-red-400" />
+          <div className="khung_xem_video">
+            {/* Video Player */}
+            {movie.embed_url ? (
+              <iframe
+                src={movie.embed_url}
+                title={`${movie.title} - Player`}
+                className="w-full h-full rounded-lg"
+                frameBorder="0"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+                <div className="text-center p-8">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <Play className="w-8 h-8 text-red-400" />
+                  </div>
+                  <div className="text-red-400 text-xl mb-2 font-semibold">
+                    Video not available
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    No embed URL found for this movie
+                  </p>
                 </div>
-                <div className="text-red-400 text-xl mb-2 font-semibold">
-                  Video not available
-                </div>
-                <p className="text-gray-400 text-sm">
-                  No embed URL found for this movie
-                </p>
               </div>
-            </div>
-          )}
-
-          {/* Server and Quality Selection - Top Section */}
-          <div className="absolute top-0 left-0 right-0 z-20">
-            <div className="bg-gradient-to-b from-black/90 via-black/70 to-transparent p-3 sm:p-4">
-              
-            </div>
-          </div>
-
-          {/* Enhanced Player Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0">
+            )}
             {/* Progress Bar */}
             <div className="h-1 bg-gray-600/50 relative">
               <div className="h-full bg-accent-cyan w-[15%] relative">
                 <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-accent-cyan rounded-full shadow-lg"></div>
               </div>
             </div>
+            {/* Main Controls Row */}
+            <div className="flex items-center justify-between">
+              {/* Left Controls */}
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <Button
+                  onClick={() => setIsWatching(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
+                >
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
 
-            {/* Controls Container */}
-            <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
-              {/* Main Controls Row */}
-              <div className="flex items-center justify-between">
-                {/* Left Controls */}
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <Button
-                    onClick={() => setIsWatching(false)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
-                  >
-                    <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </Button>
-
-                  <div className="flex items-center space-x-1 text-xs sm:text-sm text-white font-medium">
-                    <span>0:01</span>
-                    <span className="text-gray-400">/</span>
-                    <span className="text-gray-300">1:36:02</span>
-                    <Badge className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5">
-                      LIVE
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Right Controls */}
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+                <div className="flex items-center space-x-1 text-xs sm:text-sm text-white font-medium">
+                  <span>0:01</span>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-gray-300">1:36:02</span>
+                  <Badge className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5">
+                    LIVE
+                  </Badge>
                 </div>
               </div>
 
+              {/* Right Controls */}
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded p-1.5"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded p-1.5"
+                >
+                  <Share2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Player Controls Overlay */}
+          <div className="absolute bottom-0 left-0 right-0">
+            {/* Controls Container */}
+            <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
               {/* Server and Quality Selection - Bottom Section */}
               <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-white/10">
                 {/* Server Selection */}
                 <div className="flex items-center gap-2">
-                  <span className="text-white text-sm font-medium">Server:</span>
+                  <span className="text-white text-sm font-medium">
+                    Server:
+                  </span>
                   <div className="flex gap-1">
                     <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
                       Server 1
@@ -240,7 +235,9 @@ export default function MovieDetail() {
 
                 {/* Quality Selection */}
                 <div className="flex items-center gap-2">
-                  <span className="text-white text-sm font-medium">Quality:</span>
+                  <span className="text-white text-sm font-medium">
+                    Quality:
+                  </span>
                   <div className="flex gap-1">
                     <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
                       Full HD
