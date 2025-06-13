@@ -31,6 +31,15 @@ export const episodes = pgTable("episodes", {
   duration: integer("duration"), // in minutes
 });
 
+export const servers = pgTable("servers", {
+  id: serial("id").primaryKey(),
+  movieId: integer("movie_id").references(() => movies.id).notNull(),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
+  type: text("type").notNull(), // 'direct' or 'embed'
+  quality: text("quality").default('HD'),
+});
+
 export const insertMovieSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
@@ -53,10 +62,16 @@ export const insertEpisodeSchema = createInsertSchema(episodes).omit({
   id: true,
 });
 
+export const insertServerSchema = createInsertSchema(servers).omit({
+  id: true,
+});
+
 export type Movie = typeof movies.$inferSelect;
 export type InsertMovie = z.infer<typeof insertMovieSchema>;
 export type Episode = typeof episodes.$inferSelect;
 export type InsertEpisode = z.infer<typeof insertEpisodeSchema>;
+export type Server = typeof servers.$inferSelect;
+export type InsertServer = z.infer<typeof insertServerSchema>;
 
 // Filter types
 export const filterSchema = z.object({

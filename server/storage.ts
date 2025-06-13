@@ -1,4 +1,4 @@
-import { movies, episodes, type Movie, type InsertMovie, type Episode, type InsertEpisode } from "@shared/schema";
+import { movies, episodes, servers, type Movie, type InsertMovie, type Episode, type InsertEpisode, type Server, type InsertServer } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, and, or, desc, asc, count, sql } from "drizzle-orm";
 
@@ -24,6 +24,12 @@ export interface IStorage {
   // Episodes
   getEpisodes(movieId: number): Promise<Episode[]>;
   createEpisode(episode: InsertEpisode): Promise<Episode>;
+
+  // Servers
+  getServers(movieId: number): Promise<Server[]>;
+  createServer(server: InsertServer): Promise<Server>;
+  updateServer(id: number, server: InsertServer): Promise<Server>;
+  deleteServer(id: number): Promise<void>;
 }
 
 export class Storage implements IStorage {
@@ -180,6 +186,30 @@ export class Storage implements IStorage {
   async createEpisode(episodeData: InsertEpisode): Promise<Episode> {
     const [episode] = await db.insert(episodes).values(episodeData).returning();
     return episode;
+  }
+
+  async getServers(movieId: number): Promise<Server[]> {
+    const result = await db.select().from(servers)
+      .where(eq(servers.movieId, movieId))
+      .orderBy(asc(servers.id));
+    return result;
+  }
+
+  async createServer(serverData: InsertServer): Promise<Server> {
+    const [server] = await db.insert(servers).values(serverData).returning();
+    return server;
+  }
+
+  async updateServer(id: number, serverData: InsertServer): Promise<Server> {
+    const [updated] = await db.update(servers)
+      .set(serverData)
+      .where(eq(servers.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteServer(id: number): Promise<void> {
+    await db.delete(servers).where(eq(servers.id, id));
   }
 }
 

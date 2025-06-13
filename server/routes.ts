@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { filterSchema, insertMovieSchema, insertEpisodeSchema } from "@shared/schema";
+import { filterSchema, insertMovieSchema, insertEpisodeSchema, insertServerSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -211,6 +211,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid episode data", errors: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get servers for a movie
+  app.get("/api/movies/:id/servers", async (req, res) => {
+    try {
+      const movieId = parseInt(req.params.id);
+      if (isNaN(movieId)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const servers = await storage.getServers(movieId);
+      res.json(servers);
+    } catch (error) {
+      console.error("Get servers error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create server for a movie
+  app.post("/api/movies/:id/servers", async (req, res) => {
+    try {
+      const movieId = parseInt(req.params.id);
+      if (isNaN(movieId)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      const movie = await storage.getMovie(movieId);
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
+
+      const serverData = insertServerSchema.parse({
+        ...req.body,
+        movieId: movieId
+      });
+      
+      const server = await storage.createServer(serverData);
+      res.status(201).json(server);
+    } catch (error) {
+      console.error("Create server error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid server data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update server
+  app.put("/api/servers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid server ID" });
+      }
+
+      const serverData = insertServerSchema.parse(req.body);
+      const updatedServer = await storage.updateServer(id, serverData);
+      res.json(updatedServer);
+    } catch (error) {
+      console.error("Update server error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid server data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete server
+  app.delete("/api/servers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid server ID" });
+      }
+
+      await storage.deleteServer(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Delete server error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
