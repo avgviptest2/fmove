@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import MovieGrid from '@/components/MovieGrid';
-import Sidebar from '@/components/Sidebar';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Movie, MovieFilters } from '@shared/schema';
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import MovieGrid from "@/components/MovieGrid";
+import Sidebar from "@/components/Sidebar";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Movie, MovieFilters } from "@shared/schema";
 
 export default function Movies() {
   const [, setLocation] = useLocation();
-  const [filters, setFilters] = useState<MovieFilters>({ 
-    sort: 'latest',
-    type: 'all',
-    page: 1 
+  const [filters, setFilters] = useState<MovieFilters>({
+    sort: "latest",
+    type: "all",
+    page: 1,
   });
 
   // Parse URL search params
@@ -20,13 +20,14 @@ export default function Movies() {
     const params = new URLSearchParams(window.location.search);
     const newFilters: MovieFilters = { page: 1 };
 
-    if (params.get('search')) newFilters.search = params.get('search')!;
-    if (params.get('type')) newFilters.type = params.get('type') as any;
-    if (params.get('genre')) newFilters.genre = params.get('genre')!;
-    if (params.get('country')) newFilters.country = params.get('country')!;
-    if (params.get('year')) newFilters.year = params.get('year')!;
-    if (params.get('sort')) newFilters.sort = params.get('sort') as any;
-    if (params.get('page')) newFilters.page = parseInt(params.get('page')!) || 1;
+    if (params.get("search")) newFilters.search = params.get("search")!;
+    if (params.get("type")) newFilters.type = params.get("type") as any;
+    if (params.get("genre")) newFilters.genre = params.get("genre")!;
+    if (params.get("country")) newFilters.country = params.get("country")!;
+    if (params.get("year")) newFilters.year = params.get("year")!;
+    if (params.get("sort")) newFilters.sort = params.get("sort") as any;
+    if (params.get("page"))
+      newFilters.page = parseInt(params.get("page")!) || 1;
 
     setFilters(newFilters);
   }, []);
@@ -34,12 +35,16 @@ export default function Movies() {
   // Build query string for API call
   const queryString = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== 'all') {
+    if (value !== undefined && value !== "all") {
       queryString.append(key, value.toString());
     }
   });
 
-  const { data: moviesData, isLoading } = useQuery<{movies: Movie[], total: number, pages: number}>({
+  const { data: moviesData, isLoading } = useQuery<{
+    movies: Movie[];
+    total: number;
+    pages: number;
+  }>({
     queryKey: [`/api/movies?${queryString.toString()}`],
   });
 
@@ -50,13 +55,13 @@ export default function Movies() {
     // Update URL
     const params = new URLSearchParams();
     Object.entries(updatedFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== 'all' && value !== '') {
+      if (value !== undefined && value !== "all" && value !== "") {
         params.append(key, value.toString());
       }
     });
 
-    const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ''}`;
-    window.history.pushState({}, '', newUrl);
+    const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ""}`;
+    window.history.pushState({}, "", newUrl);
   };
 
   const handlePageChange = (page: number) => {
@@ -65,17 +70,17 @@ export default function Movies() {
 
     const params = new URLSearchParams();
     Object.entries(newFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== 'all' && value !== '') {
+      if (value !== undefined && value !== "all" && value !== "") {
         params.append(key, value.toString());
       }
     });
 
-    const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ''}`;
-    window.history.pushState({}, '', newUrl);
+    const newUrl = `/movies${params.toString() ? `?${params.toString()}` : ""}`;
+    window.history.pushState({}, "", newUrl);
   };
 
   const handleWatchNow = (movieId: number) => {
-    setLocation(`/player/${movieId}`);
+    setLocation(`/movie/${movieId}`);
   };
 
   const handleMovieDetails = (movieId: number) => {
@@ -102,8 +107,12 @@ export default function Movies() {
             <>
               <MovieGrid
                 movies={movies}
-                title={filters.search ? `Search Results for "${filters.search}"` : 'All Movies'}
-                onWatch={(movieId) => setLocation(`/player/${movieId}`)}
+                title={
+                  filters.search
+                    ? `Search Results for "${filters.search}"`
+                    : "All Movies"
+                }
+                onWatch={(movieId) => setLocation(`/movie/${movieId}`)}
                 onDetails={handleMovieDetails}
               />
 
@@ -137,13 +146,13 @@ export default function Movies() {
                       return (
                         <Button
                           key={page}
-                          variant={page === currentPage ? 'default' : 'ghost'}
+                          variant={page === currentPage ? "default" : "ghost"}
                           size="sm"
                           onClick={() => handlePageChange(page)}
                           className={`px-3 py-2 text-sm ${
                             page === currentPage
-                              ? 'bg-accent-cyan text-white'
-                              : 'bg-dark-secondary text-gray-300 hover:bg-dark-tertiary'
+                              ? "bg-accent-cyan text-white"
+                              : "bg-dark-secondary text-gray-300 hover:bg-dark-tertiary"
                           }`}
                         >
                           {page}
@@ -153,7 +162,9 @@ export default function Movies() {
 
                     {totalPages > 5 && currentPage < totalPages - 2 && (
                       <>
-                        <span className="px-3 py-2 text-sm text-gray-400">...</span>
+                        <span className="px-3 py-2 text-sm text-gray-400">
+                          ...
+                        </span>
                         <Button
                           variant="ghost"
                           size="sm"
