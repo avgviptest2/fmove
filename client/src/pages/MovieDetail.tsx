@@ -102,18 +102,19 @@ export default function MovieDetail() {
     <div className="min-h-screen bg-dark-primary">
       {/* Hero Backdrop - Responsive height */}
       <div
-        className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-cover bg-center group"
+        className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-cover bg-center group cursor-pointer"
         style={{
           backgroundImage: movie.backdrop
             ? `url(${movie.backdrop})`
             : undefined,
         }}
+        onClick={handleWatchNow}
       >
         {/* Light gradient for bottom fade - always visible */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-primary" />
         
         {/* Dark overlay on hover only */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all duration-300" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 ease-in-out" />
 
         {/* Large Play Button Overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
