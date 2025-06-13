@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Edit, Trash2, Search, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Save, X, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,9 +13,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { insertMovieSchema, type Movie, type InsertMovie } from '@shared/schema';
+import { insertMovieSchema, insertServerSchema } from '@shared/schema';
+import type { Movie, InsertMovie, Server as ServerType, InsertServer } from '@shared/schema';
 import { GENRES, COUNTRIES } from '@/lib/constants';
 import { z } from 'zod';
+
+// Extended schema for movie with servers
+const movieWithServersSchema = insertMovieSchema.omit({
+  play_url: true,
+  embed_url: true
+}).extend({
+  servers: z.array(insertServerSchema.omit({ movieId: true })).min(1, "At least one server is required")
+});
+
+type MovieWithServers = z.infer<typeof movieWithServersSchema>;
 
 export default function Admin() {
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
