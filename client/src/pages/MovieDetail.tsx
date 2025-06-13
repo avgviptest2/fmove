@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import MovieGrid from "@/components/MovieGrid";
 import TrailerModal from "@/components/TrailerModal";
 import type { Movie } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -42,6 +42,11 @@ export default function MovieDetail() {
   });
 
   const relatedMovies = relatedMoviesData?.movies || [];
+
+  // Reset isWatching when movie ID changes
+  useEffect(() => {
+    setIsWatching(false);
+  }, [id]);
 
   const handleWatchNow = () => {
     setIsWatching(true);
