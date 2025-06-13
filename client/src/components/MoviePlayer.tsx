@@ -1,4 +1,4 @@
-import { Play, Download, Share2, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings, SkipBack, SkipForward, Download, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
@@ -27,6 +27,13 @@ export default function MoviePlayer({
 }: MoviePlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [availableQualities, setAvailableQualities] = useState<string[]>([]);
+  const [currentQuality, setCurrentQuality] = useState<string>('auto');
   
   const { data: servers = [], isLoading: serversLoading } = useQuery<Server[]>({
     queryKey: [`/api/movies/${movie.id}/servers`],
@@ -45,6 +52,84 @@ export default function MoviePlayer({
   const isEmbedType = () => {
     const server = getCurrentServer();
     return server?.type === 'embed';
+  };
+
+  // Video control functions
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  };
+
+  const handleSeek = (percentage: number) => {
+    const video = videoRef.current;
+    if (!video || !duration) return;
+    
+    video.currentTime = (percentage / 100) * duration;
+  };
+
+  const handleVolumeChange = (newVolume: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    video.volume = newVolume;
+    setVolume(newVolume);
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    video.muted = !video.muted;
+    setVolume(video.muted ? 0 : video.volume);
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      videoRef.current?.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  const skipTime = (seconds: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    video.currentTime = Math.max(0, Math.min(duration, video.currentTime + seconds));
+  };
+
+  const formatTime = (time: number) => {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = Math.floor(time % 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const changeQuality = (quality: string) => {
+    const hls = hlsRef.current;
+    if (!hls) return;
+    
+    if (quality === 'auto') {
+      hls.currentLevel = -1; // Auto quality
+    } else {
+      const levelIndex = hls.levels.findIndex(level => `${level.height}p` === quality);
+      if (levelIndex !== -1) {
+        hls.currentLevel = levelIndex;
+      }
+    }
+    setCurrentQuality(quality);
   };
 
   // Set first server as default when servers load
@@ -85,6 +170,9 @@ export default function MoviePlayer({
         
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           console.log('HLS manifest loaded, starting playback');
+          // Extract available quality levels
+          const levels = hls.levels.map(level => `${level.height}p`);
+          setAvailableQualities(['auto', ...levels]);
         });
 
         hls.on(Hls.Events.ERROR, (event, data) => {
@@ -125,6 +213,32 @@ export default function MoviePlayer({
     };
   }, [isWatching, selectedServer, servers]);
 
+  // Video event listeners
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
+    const handleDurationChange = () => setDuration(video.duration);
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleVolumeChange = () => setVolume(video.muted ? 0 : video.volume);
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('durationchange', handleDurationChange);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('volumechange', handleVolumeChange);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('durationchange', handleDurationChange);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('volumechange', handleVolumeChange);
+    };
+  }, [isWatching]);
+
   if (!isWatching) {
     return (
       <div
@@ -160,10 +274,11 @@ export default function MoviePlayer({
               ref={videoRef}
               key={`${selectedServer}-${selectedQuality}`}
               className="w-full h-full rounded-lg"
-              controls={!isEmbedType()}
+              controls={false}
               autoPlay
               playsInline
               crossOrigin="anonymous"
+              onClick={togglePlayPause}
             />
           ) : (
             <iframe
@@ -191,37 +306,141 @@ export default function MoviePlayer({
             </div>
           </div>
         )}
-        {/* Only show controls if not embed type */}
-        {!isEmbedType() && (
+        {/* Enhanced HLS Controls for direct server types */}
+        {!isEmbedType() && getCurrentServer()?.type === 'direct' && (
           <div className="absolute bottom-0 left-0 right-0 z-20">
             <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
+              {/* Progress Bar */}
               <div className="mb-4">
-                <div className="h-1 bg-gray-600/50 relative rounded-full">
-                  <div className="h-full bg-accent-cyan w-[15%] relative rounded-full">
-                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-accent-cyan rounded-full shadow-lg"></div>
+                <div 
+                  className="h-1 bg-gray-600/50 relative rounded-full cursor-pointer group"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const percentage = ((e.clientX - rect.left) / rect.width) * 100;
+                    handleSeek(percentage);
+                  }}
+                >
+                  <div 
+                    className="h-full bg-accent-cyan relative rounded-full transition-all duration-150"
+                    style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+                  >
+                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-accent-cyan rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
                 </div>
               </div>
+
+              {/* Control Bar */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 sm:space-x-3">
+                  {/* Play/Pause Button */}
                   <Button
-                    onClick={() => setIsWatching(false)}
+                    onClick={togglePlayPause}
                     variant="ghost"
                     size="sm"
                     className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
                   >
-                    <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {isPlaying ? (
+                      <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ) : (
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
                   </Button>
+
+                  {/* Skip Controls */}
+                  <Button
+                    onClick={() => skipTime(-10)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/20 rounded p-1.5"
+                  >
+                    <SkipBack className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={() => skipTime(10)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/20 rounded p-1.5"
+                  >
+                    <SkipForward className="w-4 h-4" />
+                  </Button>
+
+                  {/* Volume Control */}
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      onClick={toggleMute}
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 rounded p-1.5"
+                    >
+                      {volume === 0 ? (
+                        <VolumeX className="w-4 h-4" />
+                      ) : (
+                        <Volume2 className="w-4 h-4" />
+                      )}
+                    </Button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={volume}
+                      onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                      className="w-16 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer hidden sm:block"
+                      style={{
+                        background: `linear-gradient(to right, #00bcd4 0%, #00bcd4 ${volume * 100}%, #374151 ${volume * 100}%, #374151 100%)`
+                      }}
+                    />
+                  </div>
+
+                  {/* Time Display */}
                   <div className="flex items-center space-x-1 text-xs sm:text-sm text-white font-medium">
-                    <span>0:01</span>
+                    <span>{formatTime(currentTime)}</span>
                     <span className="text-gray-400">/</span>
-                    <span className="text-gray-300">1:36:02</span>
-                    <Badge className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5">
-                      LIVE
-                    </Badge>
+                    <span className="text-gray-300">{formatTime(duration)}</span>
                   </div>
                 </div>
+
                 <div className="flex items-center space-x-2">
+                  {/* Quality Selection */}
+                  {availableQualities.length > 1 && (
+                    <div className="relative group">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white hover:bg-white/20 rounded p-1.5"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                      <div className="absolute bottom-full right-0 mb-2 bg-black/90 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
+                        <div className="text-white text-sm mb-2">Quality</div>
+                        {availableQualities.map((quality) => (
+                          <button
+                            key={quality}
+                            onClick={() => changeQuality(quality)}
+                            className={`block w-full text-left px-2 py-1 text-sm rounded ${
+                              currentQuality === quality
+                                ? 'bg-accent-cyan text-white'
+                                : 'text-gray-300 hover:bg-white/20'
+                            }`}
+                          >
+                            {quality}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fullscreen */}
+                  <Button
+                    onClick={toggleFullscreen}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/20 rounded p-1.5"
+                  >
+                    <Maximize className="w-4 h-4" />
+                  </Button>
+
+                  {/* Additional Controls */}
                   <Button
                     variant="ghost"
                     size="sm"
