@@ -151,6 +151,7 @@ export class Storage implements IStorage {
         backdrop: movie.backdrop,
         play_url: movie.play_url || null,
         trailer_url: movie.trailer_url || null,
+        embed_url: movie.embed_url || null,
         featured: movie.featured
       })
       .where(eq(movies.id, id))
