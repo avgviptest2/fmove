@@ -120,7 +120,7 @@ export default function MovieDetail() {
           <Button
             onClick={handleWatchNow}
             size="lg"
-            className="bg-accent-cyan/90 hover:bg-accent-cyan text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110"
+            className="bg-accent-cyan/90 hover:bg-accent-cyan text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-accent-cyan/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:brightness-125"
           >
             <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 ml-1" />
           </Button>
