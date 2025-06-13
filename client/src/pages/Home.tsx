@@ -36,7 +36,7 @@ export default function Home() {
   };
 
   const handleWatchNow = (movieId: number) => {
-    setLocation(`/movie/${movieId}`);
+    setLocation(`/player/${movieId}`);
   };
 
   const handleMovieDetails = (movieId: number) => {
