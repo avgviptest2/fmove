@@ -72,41 +72,56 @@ export default function Admin() {
 
   const createMovieMutation = useMutation({
     mutationFn: async (movieData: MovieWithServers) => {
-      // Create movie first
-      const { servers, ...movieInfo } = movieData;
-      const movie = await apiRequest(`/api/movies`, {
-        method: 'POST',
-        body: JSON.stringify(movieInfo)
-      });
+      try {
+        // Create movie first
+        const { servers, ...movieInfo } = movieData;
+        const movie = await apiRequest(`/api/movies`, {
+          method: 'POST',
+          body: JSON.stringify(movieInfo)
+        });
 
-      // Then create servers for the movie
-      for (const server of servers) {
-        if (server.url && server.url.trim()) {
-          await apiRequest(`/api/movies/${movie.id}/servers`, {
-            method: 'POST',
-            body: JSON.stringify({
-              ...server,
-              movieId: movie.id
-            })
+        // Then create servers for the movie with error handling
+        const serverPromises = servers
+          .filter(server => server.url && server.url.trim())
+          .map(async (server) => {
+            try {
+              return await apiRequest(`/api/movies/${movie.id}/servers`, {
+                method: 'POST',
+                body: JSON.stringify({
+                  ...server,
+                  movieId: movie.id
+                })
+              });
+            } catch (error) {
+              console.log(`Failed to create server ${server.name}:`, error);
+              // Don't throw here to allow other servers to be created
+              return null;
+            }
           });
-        }
-      }
 
-      return movie;
+        // Wait for all server operations to complete
+        await Promise.allSettled(serverPromises);
+
+        return movie;
+      } catch (error) {
+        console.error('Error in createMovieMutation:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/movies'] });
       setIsDialogOpen(false);
       form.reset();
       toast({
-        title: "Success",
-        description: "Movie and servers created successfully"
+        title: "Thành công",
+        description: "Phim và server đã được tạo thành công"
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Create movie error:', error);
       toast({
-        title: "Error",
-        description: "Failed to create movie",
+        title: "Lỗi",
+        description: "Không thể tạo phim. Vui lòng thử lại.",
         variant: "destructive"
       });
     }
@@ -117,36 +132,59 @@ export default function Admin() {
       const { id, movieData } = data;
       const { servers, ...movieInfo } = movieData;
 
-      // Update movie
-      const movie = await apiRequest(`/api/movies/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(movieInfo),
-      });
-
-      // Get existing servers
-      const existingServers = await apiRequest(`/api/movies/${id}/servers`);
-      
-      // Delete existing servers
-      for (const server of existingServers) {
-        await apiRequest(`/api/movies/${id}/servers/${server.id}`, {
-          method: 'DELETE'
+      try {
+        // Update movie first
+        const movie = await apiRequest(`/api/movies/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(movieInfo),
         });
-      }
 
-      // Create new servers
-      for (const server of servers) {
-        if (server.url && server.url.trim()) {
-          await apiRequest(`/api/movies/${id}/servers`, {
-            method: 'POST',
-            body: JSON.stringify({
-              ...server,
-              movieId: id
-            })
-          });
+        // Get existing servers
+        let existingServers = [];
+        try {
+          existingServers = await apiRequest(`/api/movies/${id}/servers`);
+        } catch (error) {
+          console.log('No existing servers found or error fetching servers');
         }
-      }
+        
+        // Delete existing servers with error handling
+        for (const server of existingServers) {
+          try {
+            await apiRequest(`/api/movies/${id}/servers/${server.id}`, {
+              method: 'DELETE'
+            });
+          } catch (error) {
+            console.log(`Failed to delete server ${server.id}:`, error);
+            // Continue with other servers
+          }
+        }
 
-      return movie;
+        // Create new servers with error handling
+        const serverPromises = servers
+          .filter(server => server.url && server.url.trim())
+          .map(async (server) => {
+            try {
+              return await apiRequest(`/api/movies/${id}/servers`, {
+                method: 'POST',
+                body: JSON.stringify({
+                  ...server,
+                  movieId: id
+                })
+              });
+            } catch (error) {
+              console.log(`Failed to create server ${server.name}:`, error);
+              throw error;
+            }
+          });
+
+        // Wait for all server operations to complete
+        await Promise.allSettled(serverPromises);
+
+        return movie;
+      } catch (error) {
+        console.error('Error in updateMovieMutation:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/movies'] });
@@ -154,14 +192,15 @@ export default function Admin() {
       setIsDialogOpen(false);
       form.reset();
       toast({
-        title: "Success",
-        description: "Movie updated successfully"
+        title: "Thành công",
+        description: "Phim và server đã được cập nhật thành công"
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Update movie error:', error);
       toast({
-        title: "Error",
-        description: "Failed to update movie",
+        title: "Lỗi", 
+        description: "Không thể cập nhật phim. Vui lòng thử lại.",
         variant: "destructive"
       });
     }
