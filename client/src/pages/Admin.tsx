@@ -23,7 +23,9 @@ const movieWithServersSchema = insertMovieSchema.omit({
   play_url: true,
   embed_url: true
 }).extend({
-  servers: z.array(insertServerSchema.omit({ movieId: true })).min(1, "At least one server is required")
+  servers: z.array(insertServerSchema.omit({ movieId: true }).extend({
+    id: z.number().optional() // Add optional ID for existing servers
+  })).min(1, "At least one server is required")
 });
 
 type MovieWithServers = z.infer<typeof movieWithServersSchema>;
@@ -146,39 +148,84 @@ export default function Admin() {
         } catch (error) {
           console.log('No existing servers found or error fetching servers');
         }
-        
-        // Delete existing servers with error handling
-        for (const server of existingServers) {
-          try {
-            await apiRequest(`/api/movies/${id}/servers/${server.id}`, {
-              method: 'DELETE'
-            });
-          } catch (error) {
-            console.log(`Failed to delete server ${server.id}:`, error);
-            // Continue with other servers
-          }
-        }
 
-        // Create new servers with error handling
-        const serverPromises = servers
-          .filter(server => server.url && server.url.trim())
-          .map(async (server) => {
-            try {
-              return await apiRequest(`/api/movies/${id}/servers`, {
-                method: 'POST',
-                body: JSON.stringify({
-                  ...server,
-                  movieId: id
-                })
-              });
-            } catch (error) {
+        // Filter valid servers (with URL)
+        const validServers = servers.filter(server => server.url && server.url.trim());
+
+        // Create arrays for operations
+        const serversToUpdate: any[] = [];
+        const serversToCreate: any[] = [];
+        const existingServerIds = existingServers.map((s: any) => s.id);
+        const newServerIds = validServers.filter((s: any) => s.id).map((s: any) => s.id);
+
+        // Determine operations based on server ID presence
+        validServers.forEach((newServer: any) => {
+          if (newServer.id && existingServerIds.includes(newServer.id)) {
+            // Server has ID and exists - update it
+            serversToUpdate.push({
+              id: newServer.id,
+              ...newServer,
+              movieId: id
+            });
+          } else {
+            // Server has no ID or doesn't exist - create new
+            const serverData = { ...newServer };
+            delete serverData.id; // Remove ID for new servers
+            serversToCreate.push({
+              ...serverData,
+              movieId: id
+            });
+          }
+        });
+
+        // Find servers to delete (existing servers not in new list)
+        const serverIdsToDelete = existingServerIds.filter((existingId: number) => 
+          !newServerIds.includes(existingId)
+        );
+
+        // Perform server operations
+        const operations: Promise<any>[] = [];
+
+        // Update existing servers
+        serversToUpdate.forEach(server => {
+          operations.push(
+            apiRequest(`/api/movies/${id}/servers/${server.id}`, {
+              method: 'PUT',
+              body: JSON.stringify(server)
+            }).catch(error => {
+              console.log(`Failed to update server ${server.id}:`, error);
+              return null;
+            })
+          );
+        });
+
+        // Create new servers
+        serversToCreate.forEach(server => {
+          operations.push(
+            apiRequest(`/api/movies/${id}/servers`, {
+              method: 'POST',
+              body: JSON.stringify(server)
+            }).catch(error => {
               console.log(`Failed to create server ${server.name}:`, error);
-              throw error;
-            }
-          });
+              return null;
+            })
+          );
+        });
+
+        // Delete excess servers
+        serverIdsToDelete.forEach((serverId: number) => {
+          operations.push(
+            apiRequest(`/api/movies/${id}/servers/${serverId}`, {
+              method: 'DELETE'
+            }).catch(error => {
+              console.log(`Failed to delete server ${serverId}:`, error);
+              return null;
+            })
+          );
+        });
 
         // Wait for all server operations to complete
-        await Promise.allSettled(serverPromises);
+        await Promise.allSettled(operations);
 
         return movie;
       } catch (error) {
@@ -263,6 +310,7 @@ export default function Admin() {
         trailer_url: movie.trailer_url || '',
         featured: movie.featured || false,
         servers: servers.length > 0 ? servers.map((s: ServerType) => ({
+          id: s.id, // Preserve server ID for updates
           name: s.name,
           url: s.url,
           type: s.type as "direct" | "embed",
