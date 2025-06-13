@@ -1,8 +1,12 @@
-
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { X, Play } from 'lucide-react';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { X, Play } from "lucide-react";
 
 interface TrailerModalProps {
   isOpen: boolean;
@@ -11,18 +15,27 @@ interface TrailerModalProps {
   movieTitle: string;
 }
 
-export default function TrailerModal({ isOpen, onClose, trailerUrl, movieTitle }: TrailerModalProps) {
+export default function TrailerModal({
+  isOpen,
+  onClose,
+  trailerUrl,
+  movieTitle,
+}: TrailerModalProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Extract video ID from YouTube URL
   const getYouTubeVideoId = (url: string) => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    if (!url) return null;
+    const regex =
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
 
   const videoId = getYouTubeVideoId(trailerUrl);
-  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : null;
+  const embedUrl = videoId
+    ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
+    : null;
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -41,10 +54,10 @@ export default function TrailerModal({ isOpen, onClose, trailerUrl, movieTitle }
             {movieTitle} - Trailer
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="aspect-video bg-black rounded-lg overflow-hidden">
           {!isPlaying ? (
-            <div 
+            <div
               className="relative w-full h-full bg-gray-900 flex items-center justify-center cursor-pointer group"
               onClick={handlePlay}
             >
