@@ -22,6 +22,7 @@ export default function MovieDetail() {
   const [, setLocation] = useLocation();
   const [isLiked, setIsLiked] = useState(false);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  const [isWatching, setIsWatching] = useState(false);
 
   const {
     data: movie,
@@ -44,9 +45,7 @@ export default function MovieDetail() {
   const relatedMovies = relatedMoviesData?.movies || [];
 
   const handleWatchNow = () => {
-    if (movie) {
-      setLocation(`/player/${movie.id}`);
-    }
+    setIsWatching(true);
   };
 
   const handleDownload = () => {
@@ -100,33 +99,93 @@ export default function MovieDetail() {
 
   return (
     <div className="min-h-screen bg-dark-primary">
-      {/* Hero Backdrop - Responsive height */}
-      <div
-        className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-cover bg-center group cursor-pointer"
-        style={{
-          backgroundImage: movie.backdrop
-            ? `url(${movie.backdrop})`
-            : undefined,
-        }}
-        onClick={handleWatchNow}
-      >
-        {/* Light gradient for bottom fade - always visible */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-primary" />
-        
-        {/* Dark overlay on hover only */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 ease-in-out" />
+      {/* Hero Backdrop or Inline Player */}
+      {!isWatching ? (
+        <div
+          className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-cover bg-center group cursor-pointer"
+          style={{
+            backgroundImage: movie.backdrop
+              ? `url(${movie.backdrop})`
+              : undefined,
+          }}
+          onClick={handleWatchNow}
+        >
+          {/* Light gradient for bottom fade - always visible */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-primary" />
+          
+          {/* Dark overlay on hover only */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 ease-in-out" />
 
-        {/* Large Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Button
-            onClick={handleWatchNow}
-            size="lg"
-            className="bg-accent-cyan/90 hover:bg-accent-cyan group-hover:bg-accent-cyan group-hover:scale-110 group-hover:shadow-accent-cyan/50 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] group-hover:brightness-125 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-accent-cyan/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:brightness-125"
-          >
-            <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 ml-1" />
-          </Button>
+          {/* Large Play Button Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Button
+              onClick={handleWatchNow}
+              size="lg"
+              className="bg-accent-cyan/90 hover:bg-accent-cyan group-hover:bg-accent-cyan group-hover:scale-110 group-hover:shadow-accent-cyan/50 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] group-hover:brightness-125 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-accent-cyan/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:brightness-125"
+            >
+              <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 ml-1" />
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-black">
+          {/* Video Player */}
+          {movie.embed_url ? (
+            <iframe
+              src={movie.embed_url}
+              title={`${movie.title} - Player`}
+              className="w-full h-full"
+              frameBorder="0"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-900">
+              <div className="text-center">
+                <div className="text-red-400 text-xl mb-4">Video not available</div>
+                <p className="text-gray-400">No embed URL found for this movie</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Player Controls Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+            <div className="flex items-center justify-between">
+              {/* Left Controls */}
+              <div className="flex items-center space-x-3">
+                <Button
+                  onClick={() => setIsWatching(false)}
+                  variant="ghost"
+                  className="text-white hover:bg-white/10 rounded-full p-2"
+                >
+                  <Play className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center space-x-2 text-sm text-white">
+                  <span>0:01</span>
+                  <span>/</span>
+                  <span>1:36:02</span>
+                </div>
+              </div>
+
+              {/* Server Selection */}
+              <div className="flex items-center space-x-2">
+                <Button className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded">
+                  Server 1
+                </Button>
+                <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-sm px-3 py-1 rounded">
+                  Full HD
+                </Button>
+                <Button className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded">
+                  Server 2
+                </Button>
+                <Button className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded">
+                  Server 3
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
