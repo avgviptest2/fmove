@@ -12,8 +12,8 @@ import MovieDetail from "@/pages/MovieDetail";
 import Player from "./pages/Player";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
-import Genres from "@/pages/Genres";
 import Countries from "@/pages/Countries";
+import Genres from "@/pages/Genres";
 
 function Router() {
   const [searchQuery, setSearchQuery] = useState("");
