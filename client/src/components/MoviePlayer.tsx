@@ -1,9 +1,10 @@
 import { Play, Download, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Movie, Server } from "@shared/schema";
+import Hls from "hls.js";
 
 interface MoviePlayerProps {
   movie: Movie;
@@ -24,6 +25,9 @@ export default function MoviePlayer({
   selectedQuality,
   setSelectedQuality,
 }: MoviePlayerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  
   const { data: servers = [], isLoading: serversLoading } = useQuery<Server[]>({
     queryKey: [`/api/movies/${movie.id}/servers`],
     enabled: !!movie.id,
@@ -49,6 +53,77 @@ export default function MoviePlayer({
       setSelectedServer(servers[0].id);
     }
   }, [servers, selectedServer, setSelectedServer]);
+
+  // Initialize HLS for direct server types
+  useEffect(() => {
+    const video = videoRef.current;
+    const currentServer = getCurrentServer();
+    const url = getCurrentServerUrl();
+
+    if (!video || !url || !isWatching || currentServer?.type !== 'direct') {
+      return;
+    }
+
+    // Clean up previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    // Check if the URL is an m3u8 file (HLS stream)
+    if (url.includes('.m3u8')) {
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          enableWorker: false,
+          lowLatencyMode: true,
+          backBufferLength: 90
+        });
+        
+        hlsRef.current = hls;
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          console.log('HLS manifest loaded, starting playback');
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('HLS Error:', data);
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.log('Network error, trying to recover...');
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.log('Media error, trying to recover...');
+                hls.recoverMediaError();
+                break;
+              default:
+                console.log('Fatal error, destroying HLS instance');
+                hls.destroy();
+                break;
+            }
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (Safari)
+        video.src = url;
+      } else {
+        console.error('HLS is not supported in this browser');
+      }
+    } else {
+      // Regular video file
+      video.src = url;
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [isWatching, selectedServer, servers]);
 
   if (!isWatching) {
     return (
@@ -82,12 +157,13 @@ export default function MoviePlayer({
         {getCurrentServerUrl() ? (
           getCurrentServer()?.type === 'direct' ? (
             <video
+              ref={videoRef}
               key={`${selectedServer}-${selectedQuality}`}
-              src={getCurrentServerUrl() || ""}
               className="w-full h-full rounded-lg"
               controls={!isEmbedType()}
               autoPlay
               playsInline
+              crossOrigin="anonymous"
             />
           ) : (
             <iframe
