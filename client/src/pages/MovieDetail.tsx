@@ -133,6 +133,7 @@ export default function MovieDetail() {
           </div>
         </div>
       ) : (
+        {/* Video Player và Control UI Container */}
         <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
           {/* Video Player */}
           {movie.embed_url ? (
@@ -173,7 +174,7 @@ export default function MovieDetail() {
               </div>
 
               {/* Main Controls Row */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 {/* Left Controls */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   <Button
@@ -213,41 +214,6 @@ export default function MovieDetail() {
                   </Button>
                 </div>
               </div>
-
-              {/* Server and Quality Selection */}
-              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
-                {/* Server Selection */}
-                <div className="flex items-center gap-2">
-                  <span className="text-white text-sm font-medium">Server:</span>
-                  <div className="flex gap-1">
-                    <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
-                      Server 1
-                    </Button>
-                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                      Server 2
-                    </Button>
-                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                      Server 3
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Quality Selection */}
-                <div className="flex items-center gap-2">
-                  <span className="text-white text-sm font-medium">Quality:</span>
-                  <div className="flex gap-1">
-                    <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
-                      Full HD
-                    </Button>
-                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                      HD
-                    </Button>
-                    <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                      720p
-                    </Button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -260,6 +226,43 @@ export default function MovieDetail() {
           >
             <X className="w-4 h-4" />
           </Button>
+        </div>
+
+        {/* Server và Quality Selection - Div riêng */}
+        <div className="w-full mt-4 bg-dark-secondary/50 rounded-lg p-4 border border-gray-700/50">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Server Selection */}
+            <div className="flex items-center gap-2">
+              <span className="text-white text-sm font-medium">Server:</span>
+              <div className="flex gap-1">
+                <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
+                  Server 1
+                </Button>
+                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                  Server 2
+                </Button>
+                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                  Server 3
+                </Button>
+              </div>
+            </div>
+
+            {/* Quality Selection */}
+            <div className="flex items-center gap-2">
+              <span className="text-white text-sm font-medium">Quality:</span>
+              <div className="flex gap-1">
+                <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
+                  Full HD
+                </Button>
+                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                  HD
+                </Button>
+                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
+                  720p
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
