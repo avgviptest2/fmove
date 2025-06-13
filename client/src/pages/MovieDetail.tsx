@@ -1,4 +1,3 @@
-
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -112,7 +111,7 @@ export default function MovieDetail() {
         >
           {/* Light gradient for bottom fade - always visible */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-primary" />
-          
+
           {/* Dark overlay on hover only */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 ease-in-out" />
 
@@ -121,7 +120,7 @@ export default function MovieDetail() {
             <Button
               onClick={handleWatchNow}
               size="lg"
-              className="bg-accent-cyan/90 hover:bg-accent-cyan group-hover:bg-accent-cyan group-hover:scale-110 group-hover:shadow-accent-cyan/50 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] group-hover:brightness-125 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-accent-cyan/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:brightness-125"
+              className="bg-accent-cyan/90 bg-accent-cyan hover:bg-accent-cyan group-hover:bg-accent-cyan group-hover:scale-110 group-hover:shadow-accent-cyan/50 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] group-hover:brightness-125 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-accent-cyan/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:brightness-125"
             >
               <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 ml-1" />
             </Button>
@@ -142,12 +141,16 @@ export default function MovieDetail() {
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-900">
               <div className="text-center">
-                <div className="text-red-400 text-xl mb-4">Video not available</div>
-                <p className="text-gray-400">No embed URL found for this movie</p>
+                <div className="text-red-400 text-xl mb-4">
+                  Video not available
+                </div>
+                <p className="text-gray-400">
+                  No embed URL found for this movie
+                </p>
               </div>
             </div>
           )}
-          
+
           {/* Player Controls Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
             <div className="flex items-center justify-between">
@@ -191,7 +194,6 @@ export default function MovieDetail() {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Responsive layout optimized for 768px-1024px */}
         <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-6 lg:gap-8">
-          
           {/* Movie Poster - Optimized for tablet and small desktop */}
           <div className="md:col-span-4 lg:col-span-3 xl:col-span-2">
             <div className="flex flex-col items-center md:items-start space-y-4">
@@ -272,7 +274,9 @@ export default function MovieDetail() {
                 </div>
 
                 <div>
-                  <span className="text-accent-cyan font-medium">Director:</span>
+                  <span className="text-accent-cyan font-medium">
+                    Director:
+                  </span>
                   <span className="ml-2 text-gray-300">
                     {movie.type === "movie" ? "Director Name" : "Show Creator"}
                   </span>
@@ -286,7 +290,9 @@ export default function MovieDetail() {
                 </div>
 
                 <div>
-                  <span className="text-accent-cyan font-medium">Duration:</span>
+                  <span className="text-accent-cyan font-medium">
+                    Duration:
+                  </span>
                   <span className="ml-2 text-gray-300">
                     {movie.duration} min
                   </span>
