@@ -133,7 +133,7 @@ export default function MovieDetail() {
           </div>
         </div>
       ) : (
-        <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[32rem] bg-black rounded-lg overflow-hidden shadow-2xl">
+        <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
           {/* Video Player */}
           {movie.embed_url ? (
             <iframe
