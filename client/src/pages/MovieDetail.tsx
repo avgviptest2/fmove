@@ -23,6 +23,8 @@ export default function MovieDetail() {
   const [isLiked, setIsLiked] = useState(false);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
   const [isWatching, setIsWatching] = useState(false);
+  const [selectedServer, setSelectedServer] = useState(1);
+  const [selectedQuality, setSelectedQuality] = useState('1080p');
 
   const {
     data: movie,
@@ -47,7 +49,22 @@ export default function MovieDetail() {
   // Reset isWatching when movie ID changes
   useEffect(() => {
     setIsWatching(false);
+    setSelectedServer(1);
+    setSelectedQuality('1080p');
   }, [id]);
+
+  // Danh sách server với URL khác nhau
+  const servers = [
+    { id: 1, name: 'Server 1', url: movie?.embed_url || movie?.play_url },
+    { id: 2, name: 'Server 2', url: movie?.play_url || movie?.embed_url },
+    { id: 3, name: 'Server VIP', url: movie?.trailer_url }, // Có thể dùng trailer làm server demo
+  ];
+
+  // Lấy URL của server được chọn
+  const getCurrentServerUrl = () => {
+    const server = servers.find(s => s.id === selectedServer);
+    return server?.url;
+  };
 
   const handleWatchNow = () => {
     setIsWatching(true);
@@ -230,21 +247,26 @@ export default function MovieDetail() {
         </div>
 
         {/* Server and  Quality Selection - Div rieng */}
-        <div className="w-full bg-black/95   p-4  ">
+        <div className="w-full bg-black/95 p-4">
           <div className="flex flex-wrap items-center gap-4">
             {/* Server Selection */}
             <div className="flex items-center gap-2">
               <span className="text-white text-sm font-medium">Server:</span>
               <div className="flex gap-1">
-                <Button className="bg-accent-cyan hover:bg-accent-cyan-hover text-white text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors">
-                  Server 1
-                </Button>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                  Server 2
-                </Button>
-                <Button className="bg-gray-700/80 hover:bg-gray-600 text-white text-xs px-3 py-1.5 h-auto rounded-lg transition-colors">
-                  Server 3
-                </Button>
+                {servers.map((server) => (
+                  <Button
+                    key={server.id}
+                    onClick={() => setSelectedServer(server.id)}
+                    className={`text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors ${
+                      selectedServer === server.id
+                        ? 'bg-accent-cyan hover:bg-accent-cyan-hover text-white'
+                        : 'bg-gray-700/80 hover:bg-gray-600 text-white'
+                    }`}
+                    disabled={!server.url}
+                  >
+                    {server.name}
+                  </Button>
+                ))}
               </div>
             </div>
 
