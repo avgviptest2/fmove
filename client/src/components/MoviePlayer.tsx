@@ -1,4 +1,4 @@
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, SkipBack, SkipForward, Download, Share2, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Download, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
@@ -68,9 +68,11 @@ export default function MoviePlayer({
 
   const handleSeek = (percentage: number) => {
     const video = videoRef.current;
-    if (!video || !duration) return;
+    if (!video || !duration || isNaN(duration)) return;
     
-    video.currentTime = (percentage / 100) * duration;
+    const newTime = (percentage / 100) * duration;
+    video.currentTime = Math.max(0, Math.min(duration, newTime));
+    setCurrentTime(newTime);
   };
 
   const handleVolumeChange = (newVolume: number) => {
@@ -216,28 +218,54 @@ export default function MoviePlayer({
   // Video event listeners
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !isWatching) return;
 
-    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
-    const handleDurationChange = () => setDuration(video.duration);
+    const handleTimeUpdate = () => {
+      const time = video.currentTime || 0;
+      setCurrentTime(time);
+      console.log('Time update:', time);
+    };
+    
+    const handleDurationChange = () => {
+      const dur = video.duration || 0;
+      setDuration(dur);
+      console.log('Duration change:', dur);
+    };
+    
+    const handleLoadedMetadata = () => {
+      const dur = video.duration || 0;
+      setDuration(dur);
+      console.log('Loaded metadata, duration:', dur);
+    };
+    
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     const handleVolumeChange = () => setVolume(video.muted ? 0 : video.volume);
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('durationchange', handleDurationChange);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
 
+    // Initialize values if video is already loaded
+    if (video.duration) {
+      setDuration(video.duration);
+    }
+    if (video.currentTime) {
+      setCurrentTime(video.currentTime);
+    }
+
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('durationchange', handleDurationChange);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [isWatching]);
+  }, [isWatching, selectedServer]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -249,14 +277,7 @@ export default function MoviePlayer({
           e.preventDefault();
           togglePlayPause();
           break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          skipTime(-10);
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          skipTime(10);
-          break;
+
         case 'ArrowUp':
           e.preventDefault();
           handleVolumeChange(Math.min(1, volume + 0.1));
@@ -387,23 +408,7 @@ export default function MoviePlayer({
                     )}
                   </Button>
 
-                  {/* Skip Controls */}
-                  <Button
-                    onClick={() => skipTime(-10)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <SkipBack className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    onClick={() => skipTime(10)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <SkipForward className="w-4 h-4" />
-                  </Button>
+
 
                   {/* Volume Control */}
                   <div className="flex items-center space-x-2">
