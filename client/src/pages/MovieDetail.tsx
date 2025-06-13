@@ -70,6 +70,7 @@ export default function MovieDetail() {
   };
 
   const handleDownload = () => {
+    // Demo functionality
     alert("Download feature coming soon!");
   };
 
@@ -148,149 +149,149 @@ export default function MovieDetail() {
           </div>
         </div>
       ) : (
-      <>
-        {/* Video Player and Control UI Container */}
-        <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
-          {/* Video Player */}
-          {getCurrentServerUrl() ? (
-            <iframe
-              key={`${selectedServer}-${selectedQuality}`}
-              src={getCurrentServerUrl() || ""}
-              title={`${movie.title} - Player`}
-              className="w-full h-full rounded-lg"
-              frameBorder="0"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-              <div className="text-center p-8">
-                <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <Play className="w-8 h-8 text-red-400" />
+        <>
+          {/* Video Player and Control UI Container */}
+          <div className="relative w-full h-80 sm:h-96 md:h-[28rem] lg:h-[40rem] xl:h-[45rem] bg-black rounded-lg overflow-hidden shadow-2xl">
+            {/* Video Player */}
+            {getCurrentServerUrl() ? (
+              <iframe
+                key={`${selectedServer}-${selectedQuality}`}
+                src={getCurrentServerUrl() || ""}
+                title={`${movie.title} - Player`}
+                className="w-full h-full rounded-lg"
+                frameBorder="0"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+                <div className="text-center p-8">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <Play className="w-8 h-8 text-red-400" />
+                  </div>
+                  <div className="text-red-400 text-xl mb-2 font-semibold">
+                    Video not available
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    This server is not available for streaming
+                  </p>
                 </div>
-                <div className="text-red-400 text-xl mb-2 font-semibold">
-                  Video not available
+              </div>
+            )}
+
+            {/* Player Controls Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 z-20">
+              <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
+                {/* Progress Bar */}
+                <div className="mb-4">
+                  <div className="h-1 bg-gray-600/50 relative rounded-full">
+                    <div className="h-full bg-accent-cyan w-[15%] relative rounded-full">
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-accent-cyan rounded-full shadow-lg"></div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-400 text-sm">
-                  This server is not available for streaming
-                </p>
+
+                {/* Main Controls Row */}
+                <div className="flex items-center justify-between">
+                  {/* Left Controls */}
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <Button
+                      onClick={() => setIsWatching(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
+                    >
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </Button>
+
+                    <div className="flex items-center space-x-1 text-xs sm:text-sm text-white font-medium">
+                      <span>0:01</span>
+                      <span className="text-gray-400">/</span>
+                      <span className="text-gray-300">1:36:02</span>
+                      <Badge className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5">
+                        LIVE
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Right Controls */}
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 rounded p-1.5"
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 rounded p-1.5"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Player Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 z-20">
-            <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-3 sm:p-4">
-              {/* Progress Bar */}
-              <div className="mb-4">
-                <div className="h-1 bg-gray-600/50 relative rounded-full">
-                  <div className="h-full bg-accent-cyan w-[15%] relative rounded-full">
-                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-accent-cyan rounded-full shadow-lg"></div>
-                  </div>
+            {/* Close Player Button */}
+            <Button
+              onClick={() => setIsWatching(false)}
+              variant="ghost"
+              size="sm"
+              className="absolute top-3 right-3 text-white hover:bg-black/50 rounded-full p-2 backdrop-blur-sm border border-white/20 transition-all duration-200 z-30"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Server and Quality Selection - Separate Panel */}
+          <div className="w-full bg-black/95 p-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Server Selection */}
+              <div className="flex items-center gap-2">
+                <span className="text-white text-sm font-medium">Server:</span>
+                <div className="flex gap-1">
+                  {servers.map((server) => (
+                    <Button
+                      key={server.id}
+                      onClick={() => setSelectedServer(server.id)}
+                      className={`text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors ${
+                        selectedServer === server.id
+                          ? 'bg-accent-cyan hover:bg-accent-cyan-hover text-white'
+                          : 'bg-gray-700/80 hover:bg-gray-600 text-white'
+                      }`}
+                      disabled={!server.url}
+                    >
+                      {server.name}
+                    </Button>
+                  ))}
                 </div>
               </div>
 
-              {/* Main Controls Row */}
-              <div className="flex items-center justify-between">
-                {/* Left Controls */}
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <Button
-                    onClick={() => setIsWatching(false)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
-                  >
-                    <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </Button>
-
-                  <div className="flex items-center space-x-1 text-xs sm:text-sm text-white font-medium">
-                    <span>0:01</span>
-                    <span className="text-gray-400">/</span>
-                    <span className="text-gray-300">1:36:02</span>
-                    <Badge className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5">
-                      LIVE
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Right Controls */}
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 rounded p-1.5"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+              {/* Quality Selection */}
+              <div className="flex items-center gap-2">
+                <span className="text-white text-sm font-medium">Quality:</span>
+                <div className="flex gap-1">
+                  {['Full HD', 'HD', '720p'].map((quality) => (
+                    <Button
+                      key={quality}
+                      onClick={() => setSelectedQuality(quality)}
+                      className={`text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors ${
+                        selectedQuality === quality
+                          ? 'bg-accent-cyan hover:bg-accent-cyan-hover text-white'
+                          : 'bg-gray-700/80 hover:bg-gray-600 text-white'
+                      }`}
+                    >
+                      {quality}
+                    </Button>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Close Player Button */}
-          <Button
-            onClick={() => setIsWatching(false)}
-            variant="ghost"
-            size="sm"
-            className="absolute top-3 right-3 text-white hover:bg-black/50 rounded-full p-2 backdrop-blur-sm border border-white/20 transition-all duration-200 z-30"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Server and Quality Selection - Separate Div */}
-        <div className="w-full bg-black/95 p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Server Selection */}
-            <div className="flex items-center gap-2">
-              <span className="text-white text-sm font-medium">Server:</span>
-              <div className="flex gap-1">
-                {servers.map((server) => (
-                  <Button
-                    key={server.id}
-                    onClick={() => setSelectedServer(server.id)}
-                    className={`text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors ${
-                      selectedServer === server.id
-                        ? 'bg-accent-cyan hover:bg-accent-cyan-hover text-white'
-                        : 'bg-gray-700/80 hover:bg-gray-600 text-white'
-                    }`}
-                    disabled={!server.url}
-                  >
-                    {server.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quality Selection */}
-            <div className="flex items-center gap-2">
-              <span className="text-white text-sm font-medium">Quality:</span>
-              <div className="flex gap-1">
-                {['Full HD', 'HD', '720p'].map((quality) => (
-                  <Button
-                    key={quality}
-                    onClick={() => setSelectedQuality(quality)}
-                    className={`text-xs px-3 py-1.5 h-auto rounded-lg font-semibold transition-colors ${
-                      selectedQuality === quality
-                        ? 'bg-accent-cyan hover:bg-accent-cyan-hover text-white'
-                        : 'bg-gray-700/80 hover:bg-gray-600 text-white'
-                    }`}
-                  >
-                    {quality}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
+        </>
       )}
 
       {/* Main Content */}
@@ -345,127 +346,204 @@ export default function MovieDetail() {
                     <Film className="w-4 h-4" />
                     <span>{movie.duration} min</span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-yellow-400 font-medium">{movie.rating}</span>
-                  </div>
+                  {movie.rating && (
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400 font-semibold">
+                        {movie.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Genres */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {movie.genres?.map((genre: string, index: number) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="text-gray-300 border-gray-600 hover:bg-gray-700/50 transition-colors"
-                    >
-                      {genre}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="prose prose-gray max-w-none">
-                <p className="text-gray-300 text-sm md:text-base lg:text-base leading-relaxed">
+                <p className="text-gray-300 leading-relaxed mb-4 md:mb-5 lg:mb-6 text-sm md:text-sm lg:text-base">
                   {movie.description}
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 sm:gap-4 pt-2">
+              {/* Movie Details - Optimized for medium screens */}
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-6 gap-y-2 text-sm">
+                <div>
+                  <span className="text-accent-cyan font-medium">Genres:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.genres.join(", ")}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Actor:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.type === "movie" ? "Various Artists" : "TV Cast"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">
+                    Director:
+                  </span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.type === "movie" ? "Director Name" : "Show Creator"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Country:</span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.countries.join(", ")}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">
+                    Duration:
+                  </span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.duration} min
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Quality:</span>
+                  <Badge className="ml-2 bg-green-600 text-white text-xs">
+                    {movie.quality}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">Release:</span>
+                  <span className="ml-2 text-gray-300">{movie.year}</span>
+                </div>
+
+                <div>
+                  <span className="text-accent-cyan font-medium">IMDb:</span>
+                  <span className="ml-2 text-yellow-400">
+                    {movie.rating?.toFixed(1) || "N/A"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Keywords */}
+              <div>
+                <span className="text-accent-cyan font-medium">Keywords:</span>
+                <span className="ml-2 text-gray-400 text-sm">
+                  {movie.genres
+                    .slice(0, 4)
+                    .map((genre) => genre.toLowerCase())
+                    .join(", ")}
+                </span>
+              </div>
+
+              {/* Action Buttons on mobile and tablet - show here */}
+              <div className="md:hidden space-y-3 mt-6">
                 <Button
                   onClick={handleWatchNow}
-                  size="lg"
-                  className="bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200"
+                  className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
                 >
-                  <Play className="w-5 h-5 mr-2" />
-                  Watch Now
+                  Stream in HD
                 </Button>
-                
+
                 <Button
                   onClick={handleDownload}
-                  variant="outline"
-                  size="lg"
-                  className="border-gray-600 text-white hover:bg-gray-800 font-semibold px-6 py-3 rounded-xl transition-all duration-200"
+                  className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
                 >
-                  <Download className="w-5 h-5 mr-2" />
-                  Download
+                  Download in HD
                 </Button>
-                
+
+                <div className="flex space-x-2 mt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsLiked(!isLiked)}
+                    className={`flex-1 ${isLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500`}
+                  >
+                    <Heart
+                      className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                    />
+                    Like
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShare}
+                    className="flex-1 text-gray-400 hover:text-accent-cyan"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons - Tablet and Desktop */}
+          <div className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-3">
+            <div className="space-y-3 sticky top-4">
+              <Button
+                onClick={handleWatchNow}
+                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3 text-sm md:text-base"
+              >
+                Stream in HD
+              </Button>
+
+              <Button
+                onClick={handleDownload}
+                className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3 text-sm md:text-base"
+              >
+                Download in HD
+              </Button>
+
+              <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-6">
                 <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsLiked(!isLiked)}
-                  variant="outline"
-                  size="lg"
-                  className={`border-gray-600 hover:bg-gray-800 font-semibold px-6 py-3 rounded-xl transition-all duration-200 ${
-                    isLiked ? 'text-red-500 border-red-500' : 'text-white'
-                  }`}
+                  className={`flex-1 ${isLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500`}
                 >
-                  <Heart className={`w-5 h-5 mr-2 ${isLiked ? 'fill-current' : ''}`} />
-                  {isLiked ? 'Liked' : 'Like'}
+                  <Heart
+                    className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                  />
+                  Like
                 </Button>
-                
+
                 <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleShare}
-                  variant="outline"
-                  size="lg"
-                  className="border-gray-600 text-white hover:bg-gray-800 font-semibold px-6 py-3 rounded-xl transition-all duration-200"
+                  className="flex-1 text-gray-400 hover:text-accent-cyan"
                 >
-                  <Share2 className="w-5 h-5 mr-2" />
+                  <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Additional Info Panel - Optimized for smaller screens */}
-          <div className="md:col-span-3 lg:col-span-3 xl:col-span-3">
-            <div className="space-y-4 md:space-y-6">
-              {/* Movie Stats */}
-              <div className="bg-dark-secondary/50 rounded-lg p-4 border border-gray-700/50">
-                <h3 className="text-white font-semibold mb-3 text-base">Movie Info</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Type:</span>
-                    <span className="text-white capitalize">{movie.type}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Quality:</span>
-                    <Badge className="bg-green-600 text-white text-xs">
-                      {movie.quality}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Countries:</span>
-                    <span className="text-white text-right">
-                      {movie.countries?.join(', ')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Related Movies */}
+        {relatedMovies && relatedMovies.length > 0 && (
+          <div className="mt-12 sm:mt-16">
+            <MovieGrid
+              movies={relatedMovies
+                .filter((m) => m.id !== movie.id)
+                .slice(0, 6)}
+              title="Related Movies"
+              onWatch={(movieId) => setLocation(`/movie/${movieId}`)}
+              onDetails={(movieId) => setLocation(`/movie/${movieId}`)}
+            />
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Related Movies */}
-      {relatedMovies.length > 0 && (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
-          <MovieGrid
-            movies={relatedMovies.filter(m => m.id !== movie.id)}
-            title="Related Movies"
-            onWatch={() => {}}
-            onDetails={(movieId) => setLocation(`/movie/${movieId}`)}
+        {/* Trailer Modal */}
+        {movie && (
+          <TrailerModal
+            isOpen={isTrailerOpen}
+            onClose={() => setIsTrailerOpen(false)}
+            trailerUrl={movie.trailer_url || ""}
+            movieTitle={movie.title}
           />
-        </div>
-      )}
-
-      {/* Trailer Modal */}
-      <TrailerModal
-        isOpen={isTrailerOpen}
-        onClose={() => setIsTrailerOpen(false)}
-        movie={movie}
-      />
+        )}
+      </div>
     </div>
   );
 }
