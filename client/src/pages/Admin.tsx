@@ -156,7 +156,13 @@ export default function Admin() {
         const serversToUpdate: any[] = [];
         const serversToCreate: any[] = [];
         const existingServerIds = existingServers.map((s: any) => s.id);
-        const newServerIds = validServers.filter((s: any) => s.id).map((s: any) => s.id);
+        
+        // Get all server IDs that are still present in the form (including undefined for new servers)
+        const formServerIds = validServers.map((s: any) => s.id).filter(id => id !== undefined);
+
+        console.log('Existing server IDs:', existingServerIds);
+        console.log('Form server IDs:', formServerIds);
+        console.log('Valid servers:', validServers);
 
         // Determine operations based on server ID presence
         validServers.forEach((newServer: any) => {
@@ -178,10 +184,14 @@ export default function Admin() {
           }
         });
 
-        // Find servers to delete (existing servers not in new list)
+        // Find servers to delete (existing servers not in the form anymore)
         const serverIdsToDelete = existingServerIds.filter((existingId: number) => 
-          !newServerIds.includes(existingId)
+          !formServerIds.includes(existingId)
         );
+
+        console.log('Servers to update:', serversToUpdate.length);
+        console.log('Servers to create:', serversToCreate.length);
+        console.log('Servers to delete:', serverIdsToDelete);
 
         // Perform server operations
         const operations: Promise<any>[] = [];
