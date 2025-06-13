@@ -1,12 +1,20 @@
-import { useParams, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { Play, Download, Heart, Share2, Calendar, Star, Film } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import MovieGrid from '@/components/MovieGrid';
-import TrailerModal from '@/components/TrailerModal';
-import type { Movie } from '@shared/schema';
-import { useState } from 'react';
+import { useParams, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Play,
+  Download,
+  Heart,
+  Share2,
+  Calendar,
+  Star,
+  Film,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import MovieGrid from "@/components/MovieGrid";
+import TrailerModal from "@/components/TrailerModal";
+import type { Movie } from "@shared/schema";
+import { useState } from "react";
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -14,13 +22,21 @@ export default function MovieDetail() {
   const [isLiked, setIsLiked] = useState(false);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
-  const { data: movie, isLoading, error } = useQuery<Movie>({
+  const {
+    data: movie,
+    isLoading,
+    error,
+  } = useQuery<Movie>({
     queryKey: [`/api/movies/${id}`],
     enabled: !!id,
   });
 
-  const { data: relatedMoviesData } = useQuery<{movies: Movie[], total: number, pages: number}>({
-    queryKey: ['/api/movies', { limit: 6 }],
+  const { data: relatedMoviesData } = useQuery<{
+    movies: Movie[];
+    total: number;
+    pages: number;
+  }>({
+    queryKey: ["/api/movies", { limit: 6 }],
     enabled: !!movie,
   });
 
@@ -34,7 +50,7 @@ export default function MovieDetail() {
 
   const handleDownload = () => {
     // Demo functionality
-    alert('Download feature coming soon!');
+    alert("Download feature coming soon!");
   };
 
   const handleShare = () => {
@@ -46,10 +62,9 @@ export default function MovieDetail() {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+      alert("Link copied to clipboard!");
     }
   };
-
 
   const handleTrailer = () => {
     setIsTrailerOpen(true);
@@ -71,8 +86,8 @@ export default function MovieDetail() {
       <div className="min-h-screen bg-dark-primary flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-400 text-xl mb-4">Movie not found</div>
-          <Button 
-            onClick={() => setLocation('/movies')}
+          <Button
+            onClick={() => setLocation("/movies")}
             className="bg-accent-cyan hover:bg-accent-cyan-hover"
           >
             Back to Movies
@@ -85,14 +100,16 @@ export default function MovieDetail() {
   return (
     <div className="min-h-screen bg-dark-primary">
       {/* Hero Backdrop */}
-      <div 
-        className="relative h-64 bg-cover bg-center"
+      <div
+        className="container relative h-96 mx-auto  bg-cover bg-center"
         style={{
-          backgroundImage: movie.backdrop ? `url(${movie.backdrop})` : undefined,
+          backgroundImage: movie.backdrop
+            ? `url(${movie.backdrop})`
+            : undefined,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-dark-primary" />
-        
+
         {/* Large Play Button Overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
           <Button
@@ -112,8 +129,8 @@ export default function MovieDetail() {
           <div className="lg:col-span-2">
             <div className="space-y-4">
               <div className="relative group max-w-xs mx-auto lg:mx-0">
-                <img 
-                  src={movie.poster} 
+                <img
+                  src={movie.poster}
                   alt={movie.title}
                   className="w-full rounded-lg shadow-xl transition-transform duration-300 group-hover:scale-105"
                 />
@@ -123,11 +140,11 @@ export default function MovieDetail() {
                   </Badge>
                 </div>
               </div>
-              
+
               {/* Trailer Button under Poster */}
               <div className="max-w-xs mx-auto lg:mx-0">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleTrailer}
                   className="w-full border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-white"
                 >
@@ -137,7 +154,7 @@ export default function MovieDetail() {
               </div>
             </div>
           </div>
-          
+
           {/* Movie Information */}
           <div className="lg:col-span-6">
             <div className="space-y-6">
@@ -146,7 +163,7 @@ export default function MovieDetail() {
                 <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
                   {movie.title}
                 </h1>
-                
+
                 <div className="flex flex-wrap items-center gap-4 text-gray-300 mb-4">
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4" />
@@ -159,7 +176,9 @@ export default function MovieDetail() {
                   {movie.rating && (
                     <div className="flex items-center space-x-1">
                       <Star className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400 font-semibold">{movie.rating.toFixed(1)}</span>
+                      <span className="text-yellow-400 font-semibold">
+                        {movie.rating.toFixed(1)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -174,51 +193,59 @@ export default function MovieDetail() {
                 <div>
                   <span className="text-accent-cyan font-medium">Genres:</span>
                   <span className="ml-2 text-gray-300">
-                    {movie.genres.join(', ')}
+                    {movie.genres.join(", ")}
                   </span>
                 </div>
-                
+
                 <div>
                   <span className="text-accent-cyan font-medium">Actor:</span>
                   <span className="ml-2 text-gray-300">
-                    {movie.type === 'movie' ? 'Various Artists' : 'TV Cast'}
+                    {movie.type === "movie" ? "Various Artists" : "TV Cast"}
                   </span>
                 </div>
-                
+
                 <div>
-                  <span className="text-accent-cyan font-medium">Director:</span>
+                  <span className="text-accent-cyan font-medium">
+                    Director:
+                  </span>
                   <span className="ml-2 text-gray-300">
-                    {movie.type === 'movie' ? 'Director Name' : 'Show Creator'}
+                    {movie.type === "movie" ? "Director Name" : "Show Creator"}
                   </span>
                 </div>
-                
+
                 <div>
                   <span className="text-accent-cyan font-medium">Country:</span>
                   <span className="ml-2 text-gray-300">
-                    {movie.countries.join(', ')}
+                    {movie.countries.join(", ")}
                   </span>
                 </div>
-                
+
                 <div>
-                  <span className="text-accent-cyan font-medium">Duration:</span>
-                  <span className="ml-2 text-gray-300">{movie.duration} min</span>
+                  <span className="text-accent-cyan font-medium">
+                    Duration:
+                  </span>
+                  <span className="ml-2 text-gray-300">
+                    {movie.duration} min
+                  </span>
                 </div>
-                
+
                 <div>
                   <span className="text-accent-cyan font-medium">Quality:</span>
                   <Badge className="ml-2 bg-green-600 text-white text-xs">
                     {movie.quality}
                   </Badge>
                 </div>
-                
+
                 <div>
                   <span className="text-accent-cyan font-medium">Release:</span>
                   <span className="ml-2 text-gray-300">{movie.year}</span>
                 </div>
-                
+
                 <div>
                   <span className="text-accent-cyan font-medium">IMDb:</span>
-                  <span className="ml-2 text-yellow-400">{movie.rating?.toFixed(1) || 'N/A'}</span>
+                  <span className="ml-2 text-yellow-400">
+                    {movie.rating?.toFixed(1) || "N/A"}
+                  </span>
                 </div>
               </div>
 
@@ -226,40 +253,45 @@ export default function MovieDetail() {
               <div>
                 <span className="text-accent-cyan font-medium">Keywords:</span>
                 <span className="ml-2 text-gray-400 text-sm">
-                  {movie.genres.slice(0, 4).map(genre => genre.toLowerCase()).join(', ')}
+                  {movie.genres
+                    .slice(0, 4)
+                    .map((genre) => genre.toLowerCase())
+                    .join(", ")}
                 </span>
               </div>
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="lg:col-span-3">
             <div className="space-y-3">
-              <Button 
+              <Button
                 onClick={handleWatchNow}
                 className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
               >
                 Stream in HD
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={handleDownload}
                 className="w-full bg-accent-cyan hover:bg-accent-cyan-hover text-white font-semibold py-3"
               >
                 Download in HD
               </Button>
-              
+
               <div className="flex space-x-2 mt-6">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsLiked(!isLiked)}
-                  className={`flex-1 ${isLiked ? 'text-red-500' : 'text-gray-400'} hover:text-red-500`}
+                  className={`flex-1 ${isLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500`}
                 >
-                  <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`} />
+                  <Heart
+                    className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                  />
                   Like
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -270,8 +302,6 @@ export default function MovieDetail() {
                   Share
                 </Button>
               </div>
-              
-              
             </div>
           </div>
         </div>
@@ -280,9 +310,11 @@ export default function MovieDetail() {
         {relatedMovies && relatedMovies.length > 0 && (
           <div className="mt-16">
             <MovieGrid
-              movies={relatedMovies.filter(m => m.id !== movie.id).slice(0, 6)}
+              movies={relatedMovies
+                .filter((m) => m.id !== movie.id)
+                .slice(0, 6)}
               title="Related Movies"
-              onWatch={(movieId) => setLocation(`/player/${movieId}`)}
+              onWatch={(movieId) => setLocation(`/movie/${movieId}`)}
               onDetails={(movieId) => setLocation(`/movie/${movieId}`)}
             />
           </div>
@@ -293,7 +325,7 @@ export default function MovieDetail() {
           <TrailerModal
             isOpen={isTrailerOpen}
             onClose={() => setIsTrailerOpen(false)}
-            trailerUrl={movie.trailer_url || ''}
+            trailerUrl={movie.trailer_url || ""}
             movieTitle={movie.title}
           />
         )}
