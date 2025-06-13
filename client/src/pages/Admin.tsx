@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Edit, Trash2, Search, Save, X, Server } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Save, X, HardDrive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,8 +41,8 @@ export default function Admin() {
 
   const movies = moviesData?.movies || [];
 
-  const form = useForm<InsertMovie>({
-    resolver: zodResolver(insertMovieSchema),
+  const form = useForm<MovieWithServers>({
+    resolver: zodResolver(movieWithServersSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -55,25 +55,52 @@ export default function Admin() {
       rating: 7.0,
       poster: '',
       backdrop: '',
-      play_url: '',
       trailer_url: '',
       featured: false,
-      embed_url: ''
+      servers: [
+        { name: 'Server 1', url: '', type: 'direct', quality: 'HD' },
+        { name: 'Server 2', url: '', type: 'embed', quality: 'HD' },
+        { name: 'Server 3', url: '', type: 'direct', quality: 'Full HD' }
+      ]
     }
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "servers"
+  });
+
   const createMovieMutation = useMutation({
-    mutationFn: (movie: InsertMovie) => apiRequest(`/api/movies`, {
-      method: 'POST',
-      body: JSON.stringify(movie)
-    }),
+    mutationFn: async (movieData: MovieWithServers) => {
+      // Create movie first
+      const { servers, ...movieInfo } = movieData;
+      const movie = await apiRequest(`/api/movies`, {
+        method: 'POST',
+        body: JSON.stringify(movieInfo)
+      });
+
+      // Then create servers for the movie
+      for (const server of servers) {
+        if (server.url && server.url.trim()) {
+          await apiRequest(`/api/movies/${movie.id}/servers`, {
+            method: 'POST',
+            body: JSON.stringify({
+              ...server,
+              movieId: movie.id
+            })
+          });
+        }
+      }
+
+      return movie;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/movies'] });
       setIsDialogOpen(false);
       form.reset();
       toast({
         title: "Success",
-        description: "Movie created successfully"
+        description: "Movie and servers created successfully"
       });
     },
     onError: () => {
@@ -86,18 +113,40 @@ export default function Admin() {
   });
 
   const updateMovieMutation = useMutation({
-    mutationFn: async (data: { id: number } & z.infer<typeof insertMovieSchema>) => {
-      const { id, ...movieData } = data;
-      console.log('API call - updating movie ID:', id);
-      console.log('API call - movie data:', movieData);
+    mutationFn: async (data: { id: number; movieData: MovieWithServers }) => {
+      const { id, movieData } = data;
+      const { servers, ...movieInfo } = movieData;
 
-      const response = await apiRequest(`/api/movies/${id}`, {
+      // Update movie
+      const movie = await apiRequest(`/api/movies/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(movieData),
+        body: JSON.stringify(movieInfo),
       });
 
-      console.log('API response:', response);
-      return response;
+      // Get existing servers
+      const existingServers = await apiRequest(`/api/movies/${id}/servers`);
+      
+      // Delete existing servers
+      for (const server of existingServers) {
+        await apiRequest(`/api/movies/${id}/servers/${server.id}`, {
+          method: 'DELETE'
+        });
+      }
+
+      // Create new servers
+      for (const server of servers) {
+        if (server.url && server.url.trim()) {
+          await apiRequest(`/api/movies/${id}/servers`, {
+            method: 'POST',
+            body: JSON.stringify({
+              ...server,
+              movieId: id
+            })
+          });
+        }
+      }
+
+      return movie;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/movies'] });
@@ -109,7 +158,7 @@ export default function Admin() {
         description: "Movie updated successfully"
       });
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to update movie",
@@ -138,64 +187,78 @@ export default function Admin() {
     }
   });
 
-  const onSubmit = async (values: z.infer<typeof insertMovieSchema>) => {
+  const onSubmit = async (values: MovieWithServers) => {
     try {
-      console.log('Form values before submit:', values);
-
       if (editingMovie) {
-        console.log('Updating movie with ID:', editingMovie.id);
-        const updateData = {
+        await updateMovieMutation.mutateAsync({
           id: editingMovie.id,
-          ...values,
-        };
-        console.log('Update data being sent:', updateData);
-
-        await updateMovieMutation.mutateAsync(updateData);
-        toast({
-          title: "Success",
-          description: "Movie updated successfully",
+          movieData: values
         });
       } else {
-        console.log('Creating new movie with data:', values);
         await createMovieMutation.mutateAsync(values);
-        toast({
-          title: "Success", 
-          description: "Movie created successfully",
-        });
       }
-      setIsDialogOpen(false);
-      setEditingMovie(null);
-      form.reset();
     } catch (error) {
       console.error('Movie operation error:', error);
-      console.error('Error details:', error.response?.data || error.message);
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || error.message || "Failed to save movie",
-        variant: "destructive",
-      });
     }
   };
 
-  const handleEdit = (movie: Movie) => {
+  const handleEdit = async (movie: Movie) => {
     setEditingMovie(movie);
-    form.reset({
-      title: movie.title,
-      description: movie.description,
-      year: movie.year,
-      duration: movie.duration,
-      type: movie.type,
-      genres: movie.genres,
-      countries: movie.countries,
-      quality: movie.quality,
-      rating: movie.rating,
-      poster: movie.poster,
-      backdrop: movie.backdrop,
-      play_url: movie.play_url || '',
-      trailer_url: movie.trailer_url || '',
-      featured: movie.featured,
-      embed_url: movie.embed_url || ''
-    });
+    
+    // Fetch servers for this movie
+    try {
+      const servers = await apiRequest(`/api/movies/${movie.id}/servers`);
+      
+      form.reset({
+        title: movie.title,
+        description: movie.description,
+        year: movie.year,
+        duration: movie.duration,
+        type: movie.type as "movie" | "tv",
+        genres: movie.genres,
+        countries: movie.countries,
+        quality: movie.quality,
+        rating: movie.rating || 7.0,
+        poster: movie.poster,
+        backdrop: movie.backdrop || '',
+        trailer_url: movie.trailer_url || '',
+        featured: movie.featured || false,
+        servers: servers.length > 0 ? servers.map((s: ServerType) => ({
+          name: s.name,
+          url: s.url,
+          type: s.type as "direct" | "embed",
+          quality: s.quality || 'HD'
+        })) : [
+          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' },
+          { name: 'Server 2', url: '', type: 'embed', quality: 'HD' },
+          { name: 'Server 3', url: '', type: 'direct', quality: 'Full HD' }
+        ]
+      });
+    } catch (error) {
+      console.error('Failed to fetch servers:', error);
+      // Set default servers if fetch fails
+      form.reset({
+        title: movie.title,
+        description: movie.description,
+        year: movie.year,
+        duration: movie.duration,
+        type: movie.type as "movie" | "tv",
+        genres: movie.genres,
+        countries: movie.countries,
+        quality: movie.quality,
+        rating: movie.rating || 7.0,
+        poster: movie.poster,
+        backdrop: movie.backdrop || '',
+        trailer_url: movie.trailer_url || '',
+        featured: movie.featured || false,
+        servers: [
+          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' },
+          { name: 'Server 2', url: '', type: 'embed', quality: 'HD' },
+          { name: 'Server 3', url: '', type: 'direct', quality: 'Full HD' }
+        ]
+      });
+    }
+    
     setIsDialogOpen(true);
   };
 
@@ -218,7 +281,7 @@ export default function Admin() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-            <p className="text-gray-400">Manage movies and TV series</p>
+            <p className="text-gray-400">Manage movies and servers</p>
           </div>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -228,18 +291,19 @@ export default function Admin() {
                 Add Movie
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-dark-secondary border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-dark-secondary border-gray-700 max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-white">
                   {editingMovie ? 'Edit Movie' : 'Add New Movie'}
                 </DialogTitle>
                 <DialogDescription className="text-gray-400">
-                  {editingMovie ? 'Update movie information' : 'Fill in the details to add a new movie or TV series'}
+                  {editingMovie ? 'Update movie information and servers' : 'Fill in the details to add a new movie with servers'}
                 </DialogDescription>
               </DialogHeader>
 
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  {/* Basic Movie Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -317,11 +381,11 @@ export default function Admin() {
                       name="duration"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Duration (min)</FormLabel>
+                          <FormLabel className="text-gray-300">Duration (minutes)</FormLabel>
                           <FormControl>
                             <Input 
                               {...field} 
-                              type="number"
+                              type="number" 
                               onChange={(e) => field.onChange(parseInt(e.target.value))}
                               className="bg-dark-tertiary border-gray-600 text-white" 
                             />
@@ -340,8 +404,10 @@ export default function Admin() {
                           <FormControl>
                             <Input 
                               {...field} 
-                              type="number"
+                              type="number" 
                               step="0.1"
+                              min="0"
+                              max="10"
                               onChange={(e) => field.onChange(parseFloat(e.target.value))}
                               className="bg-dark-tertiary border-gray-600 text-white" 
                             />
@@ -352,176 +418,120 @@ export default function Admin() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="genres"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Genres</FormLabel>
-                          <FormControl>
-                            <div className="space-y-2">
-                              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-tertiary border border-gray-600 rounded">
-                                {GENRES.map((genre) => (
-                                  <label key={genre} className="flex items-center space-x-2 text-sm">
-                                    <input
-                                      type="checkbox"
-                                      checked={field.value?.includes(genre) || false}
-                                      onChange={(e) => {
-                                        const updatedGenres = e.target.checked
-                                          ? [...(field.value || []), genre]
-                                          : (field.value || []).filter(g => g !== genre);
-                                        field.onChange(updatedGenres);
-                                      }}
-                                      className="rounded"
-                                    />
-                                    <span className="text-gray-300">{genre}</span>
-                                  </label>
-                                ))}
+                  {/* Servers Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-white flex items-center">
+                        <HardDrive className="w-5 h-5 mr-2" />
+                        Servers
+                      </h3>
+                      <Button
+                        type="button"
+                        onClick={() => append({ name: `Server ${fields.length + 1}`, url: '', type: 'direct', quality: 'HD' })}
+                        className="bg-accent-cyan hover:bg-accent-cyan-hover"
+                        size="sm"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Server
+                      </Button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {fields.map((field, index) => (
+                        <Card key={field.id} className="bg-dark-tertiary border-gray-600">
+                          <CardContent className="pt-6">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`servers.${index}.name`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-300">Server Name</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} className="bg-dark-primary border-gray-600 text-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={form.control}
+                                name={`servers.${index}.url`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-300">URL</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} placeholder="https://..." className="bg-dark-primary border-gray-600 text-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={form.control}
+                                name={`servers.${index}.type`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-300">Type</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger className="bg-dark-primary border-gray-600 text-white">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent className="bg-dark-primary border-gray-600">
+                                        <SelectItem value="direct">Direct (Video Player)</SelectItem>
+                                        <SelectItem value="embed">Embed (iframe)</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <div className="flex items-end gap-2">
+                                <FormField
+                                  control={form.control}
+                                  name={`servers.${index}.quality`}
+                                  render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                      <FormLabel className="text-gray-300">Quality</FormLabel>
+                                      <FormControl>
+                                        <Input {...field} value={field.value || ''} placeholder="HD, Full HD..." className="bg-dark-primary border-gray-600 text-white" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                {fields.length > 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => remove(index)}
+                                    className="border-red-600 text-red-400 hover:bg-red-600/10"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
                               </div>
                             </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="countries"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Countries</FormLabel>
-                          <FormControl>
-                            <div className="space-y-2">
-                              <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto p-2 bg-dark-tertiary border border-gray-600 rounded">
-                                {COUNTRIES.map((country) => (
-                                  <label key={country} className="flex items-center space-x-2 text-sm">
-                                    <input
-                                      type="checkbox"
-                                      checked={field.value?.includes(country) || false}
-                                      onChange={(e) => {
-                                        const updatedCountries = e.target.checked
-                                          ? [...(field.value || []), country]
-                                          : (field.value || []).filter(c => c !== country);
-                                        field.onChange(updatedCountries);
-                                      }}
-                                      className="rounded"
-                                    />
-                                    <span className="text-gray-300">{country}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="poster"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Poster URL</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="backdrop"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Backdrop URL</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="play_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-300">Link Play Phim</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://example.com/video.mp4" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                   <FormField
-                    control={form.control}
-                    name="trailer_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-300">Link Trailer</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://youtube.com/watch?v=..." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="embed_url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-300">Embed URL</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="bg-dark-tertiary border-gray-600 text-white" placeholder="https://example.com/embed/video123" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex items-center space-x-2">
-                    <FormField
-                      control={form.control}
-                      name="featured"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <input
-                              type="checkbox"
-                              checked={field.value}
-                              onChange={field.onChange}
-                              className="rounded"
-                            />
-                          </FormControl>
-                          <FormLabel className="text-gray-300">
-                            Featured Movie
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-2">
+                  {/* Submit Buttons */}
+                  <div className="flex justify-end space-x-2 pt-4">
                     <Button 
                       type="button" 
                       variant="outline" 
                       onClick={() => setIsDialogOpen(false)}
-                      className="border-gray-600 text-gray-300"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
                     >
-                      <X className="w-4 h-4 mr-2" />
                       Cancel
                     </Button>
                     <Button 
@@ -530,7 +540,7 @@ export default function Admin() {
                       disabled={createMovieMutation.isPending || updateMovieMutation.isPending}
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {editingMovie ? 'Update' : 'Create'}
+                      {editingMovie ? 'Update Movie' : 'Create Movie'}
                     </Button>
                   </div>
                 </form>
@@ -544,6 +554,7 @@ export default function Admin() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
+              type="text"
               placeholder="Search movies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -552,105 +563,52 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Movies List */}
+        {/* Movies Grid */}
         {isLoading ? (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <div className="text-gray-300">Loading movies...</div>
-          </div>
+          <div className="text-center text-gray-400 py-8">Loading movies...</div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {movies.map((movie) => (
-              <Card key={movie.id} className="bg-dark-secondary border-gray-700">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-4">
-                      <img 
-                        src={movie.poster} 
-                        alt={movie.title}
-                        className="w-16 h-24 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-white mb-2">{movie.title}</h3>
-                        <p className="text-gray-400 text-sm mb-2 line-clamp-2">{movie.description}</p>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          <Badge variant="secondary" className="bg-accent-cyan text-white text-xs">
-                            {movie.type === 'movie' ? 'Movie' : 'TV Series'}
-                          </Badge>
-                          <Badge variant="outline" className="border-gray-600 text-gray-300 text-xs">
-                            {movie.year}
-                          </Badge>
-                          <Badge variant="outline" className="border-gray-600 text-gray-300 text-xs">
-                            {movie.duration} min
-                          </Badge>
-                          <Badge variant="outline" className="border-gray-600 text-gray-300 text-xs">
-                            ⭐ {movie.rating}
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {movie.genres.slice(0, 3).map((genre) => (
-                            <Badge key={genre} variant="secondary" className="bg-gray-700 text-gray-300 text-xs">
-                              {genre}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(movie)}
-                        className="border-gray-600 text-gray-300 hover:text-accent-cyan"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(movie.id)}
-                        className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+              <Card key={movie.id} className="bg-dark-secondary border-gray-700 hover:border-accent-cyan transition-colors">
+                <div className="relative">
+                  <img
+                    src={movie.poster}
+                    alt={movie.title}
+                    className="w-full h-60 object-cover rounded-t-lg"
+                  />
+                  <div className="absolute top-2 right-2 flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleEdit(movie)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(movie.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2">{movie.title}</h3>
+                  <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
+                    <span>{movie.year}</span>
+                    <Badge variant="secondary" className="bg-accent-cyan/20 text-accent-cyan">
+                      {movie.type}
+                    </Badge>
+                  </div>
+                  <p className="text-gray-400 text-sm line-clamp-3">{movie.description}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
-
-        {/* Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-dark-secondary border-gray-700">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-accent-cyan mb-2">
-                {movies.length}
-              </div>
-              <div className="text-gray-400">Total Items</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-dark-secondary border-gray-700">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-accent-cyan mb-2">
-                {movies.filter(m => m.type === 'movie').length}
-              </div>
-              <div className="text-gray-400">Movies</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-dark-secondary border-gray-700">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-accent-cyan mb-2">
-                {movies.filter(m => m.type === 'tv').length}
-              </div>
-              <div className="text-gray-400">TV Series</div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
