@@ -44,6 +44,12 @@ export default function TrailerModal({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    handleClose();
+  };
   const handleClose = () => {
     setIsPlaying(false);
     onClose();
@@ -51,12 +57,15 @@ export default function TrailerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
+      <div 
+        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+        onClick={handleOverlayClick}
+      />
       <DialogContent
-        className="max-w-4xl w-full bg-black border-gray-800"
+        className="max-w-4xl w-full bg-black border-gray-800 fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2"
         onClick={handleClick}
         onPointerDownOutside={(e) => {
           e.stopPropagation();
-          handleClose();
         }}
         onEscapeKeyDown={(e) => {
           e.stopPropagation();
