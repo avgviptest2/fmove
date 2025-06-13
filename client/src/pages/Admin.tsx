@@ -304,6 +304,7 @@ export default function Admin() {
     // Fetch servers for this movie
     try {
       const servers = await apiRequest(`/api/movies/${movie.id}/servers`);
+      console.log('Loaded servers for editing:', servers);
       
       form.reset({
         title: movie.title,
@@ -326,9 +327,7 @@ export default function Admin() {
           type: s.type as "direct" | "embed",
           quality: s.quality || 'HD'
         })) : [
-          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' },
-          { name: 'Server 2', url: '', type: 'embed', quality: 'HD' },
-          { name: 'Server 3', url: '', type: 'direct', quality: 'Full HD' }
+          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' }
         ]
       });
     } catch (error) {
@@ -349,9 +348,7 @@ export default function Admin() {
         trailer_url: movie.trailer_url || '',
         featured: movie.featured || false,
         servers: [
-          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' },
-          { name: 'Server 2', url: '', type: 'embed', quality: 'HD' },
-          { name: 'Server 3', url: '', type: 'direct', quality: 'Full HD' }
+          { name: 'Server 1', url: '', type: 'direct', quality: 'HD' }
         ]
       });
     }
